@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow-ERD: Agent-type Aware Flow Matching with Entropy-Regularized Distillation for Diverse Traffic Simulation</title>
+  <meta name="description" content="Flow-ERD is a multi-agent traffic simulator that pursues realism and diversity jointly, ranking first on the WOSAC test benchmark.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,550;9..144,650&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128664;</text></svg>">
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="#top">Flow&#8209;ERD</a>
+  <div class="navlinks">
+    <a href="#tldr">TL;DR</a>
+    <a href="#method">Method</a>
+    <a href="#results">Results</a>
+    <a href="#gallery">Rollout Gallery</a>
+    <a href="#abstract">Abstract</a>
+    <a href="#bibtex">BibTeX</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <p class="kicker">Multi-Agent Traffic Simulation</p>
+  <h1><span class="grad">Flow-ERD</span>: Agent-type Aware Flow Matching with Entropy&#8209;Regularized Distillation for Diverse Traffic Simulation</h1>
+
+  <p class="authors">Anonymous Authors<span class="dot">&middot;</span>Under double-anonymous review, IEEE Robotics and Automation Letters (RA&#8209;L)</p>
+  <!-- TODO (after acceptance): replace the line above with the real author list & affiliations. -->
+
+  <div class="linkrow">
+    <!-- TODO: when the arXiv preprint is up, turn this into
+         <a class="btn" href="https://arxiv.org/abs/XXXX.XXXXX">...</a> -->
+    <span class="btn soon" title="The arXiv preprint will be linked here soon.">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm4 18H6V4h7v5h5zM8 12h8v2H8zm0 4h8v2H8z"/></svg>
+      Paper <em>arXiv &middot; soon</em>
+    </span>
+    <span class="btn soon" title="Code will be released upon acceptance.">
+      <svg viewBox="0 0 24 24"><path d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6zm5.2 0 4.6-4.6-4.6-4.6L16 6l6 6-6 6z"/></svg>
+      Code <em>Coming Soon!</em>
+    </span>
+  </div>
+
+  <figure class="showcase">
+    <div class="frame">
+      <video src="static/videos/complex_intersection_signal_compliance_02.mp4"
+             poster="static/posters/complex_intersection_signal_compliance_02.jpg"
+             muted loop playsinline autoplay preload="auto"></video>
+    </div>
+    <figcaption>
+      <strong>Closed-loop multi-agent rollout by Flow-ERD.</strong>
+      At a large signalized junction, simulated vehicles queue on red approaches, launch when their
+      lanes turn green, and split into semantically distinct maneuvers &mdash; through, protected left,
+      and right turns &mdash; while every motion stays kinematically consistent with its agent type.
+    </figcaption>
+  </figure>
+</header>
+
+<main>
+
+<section id="tldr" class="band">
+  <h2><span class="secno">01</span>TL;DR</h2>
+  <p class="lede">
+    Traffic simulators are usually graded on <em>realism</em> against a single logged future, so recent
+    models quietly collapse onto the dominant behavior of each scene. <strong>Flow-ERD</strong> pursues
+    realism and <em>diversity</em> jointly: a flow-matching backbone samples fine-grained continuous
+    actions that are executed through <em>agent-type-specific kinematics</em> (AFM), and an
+    <em>entropy-regularized distillation</em> stage (ERD) fine-tunes the closed-loop rollout distribution
+    so that covariate shift is suppressed <em>without</em> collapsing minority modes such as rare turns.
+    Flow-ERD ranks <strong>first in realism on the WOSAC 2025 test benchmark</strong> and dominates the
+    realism&ndash;diversity Pareto front among reproducible baselines.
+  </p>
+</section>
+
+<section id="method" class="band">
+  <h2><span class="secno">02</span>Two ingredients</h2>
+  <div class="cards">
+    <article class="card">
+      <h3>AFM &mdash; Agent-Type Aware Flow Matching</h3>
+      <p>
+        A flow-matching generator predicts a shared continuous action sequence &mdash; longitudinal,
+        lateral, and heading changes &mdash; free of any token codebook. Each action is then executed
+        through a <strong>type-specific transition</strong>: holonomic motion for pedestrians,
+        non-holonomic bicycle-style motion for vehicles and cyclists. Multi-modal expressiveness comes
+        from the continuous flow; realism comes from kinematics that make type-incompatible motion
+        (e.g., lateral slip of a car) impossible by construction.
+      </p>
+    </article>
+    <article class="card">
+      <h3>ERD &mdash; Entropy-Regularized Distillation</h3>
+      <p>
+        Behavior-cloned simulators drift when they consume their own outputs in closed loop. ERD
+        fine-tunes the <strong>closed-loop rollout distribution</strong> with a reverse-KL objective
+        against an <strong>entropy-tempered</strong> data target
+        <span class="mono">p<sub>data</sub><sup>&beta;</sup></span>, &beta;&nbsp;&le;&nbsp;1. Tempering flattens the density
+        contrast between modes: covariate shift is corrected while rare-but-plausible maneuvers &mdash;
+        U-turns, unprotected lefts &mdash; survive instead of being absorbed into the dominant
+        straight-through mode.
+      </p>
+    </article>
+  </div>
+</section>
+
+<section id="results" class="band">
+  <h2><span class="secno">03</span>Results at a glance</h2>
+  <div class="stats">
+    <div class="stat">
+      <span class="big">1<sup>st</sup></span>
+      <span class="label">Realism meta-metric (RMM 0.7878) on the WOSAC 2025 test split</span>
+    </div>
+    <div class="stat">
+      <span class="big">0.5062</span>
+      <span class="label">Best kinematic score among all entries, including fine-tuned baselines</span>
+    </div>
+    <div class="stat">
+      <span class="big">1.272</span>
+      <span class="label">Best minADE on the test split</span>
+    </div>
+    <div class="stat">
+      <span class="big">Pareto</span>
+      <span class="label">Dominates the realism&ndash;diversity frontier (CPD) among reproducible baselines</span>
+    </div>
+  </div>
+  <p class="note">
+    Diversity is measured with <strong>Cross-Pair Diversity (CPD)</strong>, a log-free metric proposed in
+    the paper: the type-normalized spread across multiple closed-loop rollouts of the same scene,
+    compared only at matched realism so that drift cannot masquerade as diversity.
+  </p>
+</section>
+
+<section id="gallery" class="band">
+  <h2><span class="secno">04</span>Rollout gallery</h2>
+  <p class="lede">
+    Qualitative closed-loop rollouts in diverse scenes. The <span class="egochip">cyan</span> box is the
+    ego agent; white boxes are simulated traffic agents, all rolled out jointly by Flow-ERD.
+  </p>
+
+  <h3 class="groupTitle">Signalized intersections</h3>
+  <div class="grid">
+    <figure class="cell wide">
+      <div class="frame">
+        <video data-src="static/videos/complex_intersection_signal_compliance.mp4"
+               poster="static/posters/complex_intersection_signal_compliance.jpg"
+               muted loop playsinline preload="none"></video>
+      </div>
+      <figcaption><strong>Signal compliance at a complex junction.</strong>
+        Approaching agents hold on red lanes and clear the intersection when their signal turns green,
+        without hand-crafted traffic-light rules.</figcaption>
+    </figure>
+    <figure class="cell wide">
+      <div class="frame">
+        <video data-src="static/videos/vehicle_yields_to_pedestrians_at_crowded_street_signal.mp4"
+               poster="static/posters/vehicle_yields_to_pedestrians_at_crowded_street_signal.jpg"
+               muted loop playsinline preload="none"></video>
+      </div>
+      <figcaption><strong>Yielding on a crowded street.</strong>
+        The ego vehicle waits for a stream of pedestrians at a busy signalized crossing before
+        completing its turn.</figcaption>
+    </figure>
+  </div>
+
+  <h3 class="groupTitle">Pedestrians &amp; mixed traffic</h3>
+  <div class="grid">
+    <figure class="cell">
+      <div class="frame">
+        <video data-src="static/videos/crosswalk_pedestrian_crossing.mp4"
+               poster="static/posters/crosswalk_pedestrian_crossing.jpg"
+               muted loop playsinline preload="none"></video>
+      </div>
+      <figcaption><strong>Crosswalk crossing.</strong>
+        Pedestrians move with free holonomic motion across the crosswalk while vehicles slow and
+        wait for it to clear.</figcaption>
+    </figure>
+    <figure class="cell">
+      <div class="frame">
+        <video data-src="static/videos/motorcycle_pedestrian_handling.mp4"
+               poster="static/posters/motorcycle_pedestrian_handling.jpg"
+               muted loop playsinline preload="none"></video>
+      </div>
+      <figcaption><strong>Heterogeneous agents.</strong>
+        A motorcycle and nearby pedestrians in one scene &mdash; the shared action space is executed
+        with per-type kinematics, keeping each agent&rsquo;s motion consistent with its class.</figcaption>
+    </figure>
+  </div>
+
+  <h3 class="groupTitle">Parking areas</h3>
+  <div class="grid">
+    <figure class="cell">
+      <div class="frame">
+        <video data-src="static/videos/front_parking_success.mp4"
+               poster="static/posters/front_parking_success.jpg"
+               muted loop playsinline preload="none"></video>
+      </div>
+      <figcaption><strong>Front-in parking.</strong>
+        A low-speed, high-curvature parking maneuver stays feasible under the non-holonomic
+        vehicle transition.</figcaption>
+    </figure>
+    <figure class="cell">
+      <div class="frame">
+        <video data-src="static/videos/parking_lot_many_pedestrians.mp4"
+               poster="static/posters/parking_lot_many_pedestrians.jpg"
+               muted loop playsinline preload="none"></video>
+      </div>
+      <figcaption><strong>Parking lot with many pedestrians.</strong>
+        The ego creeps through a lot crowded with pedestrians streaming between parked cars.</figcaption>
+    </figure>
+  </div>
+
+  <h3 class="groupTitle">Highways &amp; complex layouts</h3>
+  <div class="grid">
+    <figure class="cell">
+      <div class="frame">
+        <video data-src="static/videos/highway.mp4"
+               poster="static/posters/highway.jpg"
+               muted loop playsinline preload="none"></video>
+      </div>
+      <figcaption><strong>Dense highway traffic.</strong>
+        Agents hold lanes and modulate speed smoothly over a long multi-lane segment in closed
+        loop.</figcaption>
+    </figure>
+    <figure class="cell">
+      <div class="frame">
+        <video data-src="static/videos/complex_terrain.mp4"
+               poster="static/posters/complex_terrain.jpg"
+               muted loop playsinline preload="none"></video>
+      </div>
+      <figcaption><strong>Complex road layout.</strong>
+        Irregular geometry and unusual lane topology are negotiated without drifting off the
+        map.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="abstract" class="band">
+  <h2><span class="secno">05</span>Abstract</h2>
+  <p class="abstract">
+    Realistic and diverse traffic simulation is essential to autonomous driving development. Yet
+    prevailing benchmarks predominantly reward realism, and recent methods have optimized accordingly,
+    leaving diversity underexplored. We introduce Flow-ERD, a multi-agent simulator that pursues realism
+    and diversity jointly. Its backbone, Agent-Type Aware Flow Matching (AFM), couples flow
+    matching&rsquo;s multi-modal expressiveness with type-specific kinematic execution. It preserves
+    fine-grained diversity while keeping motions consistent with each agent type. A second stage,
+    Entropy-Regularized Distillation (ERD), fine-tunes the closed-loop rollout distribution with an
+    entropy-regularized reverse-KL objective. This mitigates covariate shift while explicitly preventing
+    collapse onto high-density modes. We evaluate Flow-ERD with a log-free diversity metric alongside
+    standard realism scores. Flow-ERD ranks first on the WOSAC test benchmark and dominates the
+    realism&ndash;diversity Pareto front among reproducible baselines.
+  </p>
+</section>
+
+<section id="bibtex" class="band">
+  <h2><span class="secno">06</span>BibTeX</h2>
+  <!-- TODO: update once the arXiv preprint / camera-ready is available. -->
+  <pre class="bib"><code>@article{flowerd2026,
+  title   = {Flow-ERD: Agent-type Aware Flow Matching with Entropy-Regularized
+             Distillation for Diverse Traffic Simulation},
+  author  = {Anonymous Authors},
+  journal = {Under review at IEEE Robotics and Automation Letters (RA-L)},
+  year    = {2026}
+}</code></pre>
+</section>
+
+</main>
+
+<footer>
+  <p>
+    This page accompanies a submission under double-anonymous review; author information and code
+    will be released upon acceptance. All rollouts shown are generated by Flow-ERD on Waymo Open
+    Motion Dataset scenes.
+  </p>
+</footer>
+
+<script src="static/js/main.js"></script>
+</body>
+</html>
