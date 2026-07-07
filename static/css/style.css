@@ -72,8 +72,12 @@ h1 {
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent; color: transparent;
 }
-.authors { color: var(--muted); font-size: 15.5px; margin-bottom: 30px; }
-.authors .dot { margin: 0 10px; color: var(--line); }
+.authors { color: var(--text); font-size: 16.5px; margin-bottom: 8px; }
+.authors sup { color: var(--accent); font-size: .7em; }
+.authors .dot { margin: 0 10px; color: var(--muted); }
+.affil { color: var(--muted); font-size: 14.5px; margin-bottom: 30px; }
+.affil .contrib { display: block; font-size: 12.5px; margin-top: 4px; }
+.affil .contrib sup { color: var(--accent); }
 
 .linkrow { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 54px; }
 .btn {
