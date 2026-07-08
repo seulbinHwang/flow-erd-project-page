@@ -155,11 +155,53 @@ a.btn:hover { border-color: var(--accent); transform: translateY(-1px); }
 /* ---------- video frames ---------- */
 .showcase { margin: 0 auto; max-width: 940px; }
 .frame {
+  position: relative;
   background: #000;
   border: 1px solid var(--line);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 24px 70px -28px rgba(0,0,0,.9);
+}
+
+/* buffering spinner (hero only, while data-loading is set) */
+.frame[data-loading]::after {
+  content: "";
+  position: absolute;
+  top: 18px; right: 18px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 3px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  border-top-color: var(--accent);
+  animation: spin 0.9s linear infinite;
+  pointer-events: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* explicit play button, shown only when autoplay is blocked */
+.playhint {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(5, 6, 9, 0.35);
+  border: none; cursor: pointer;
+  transition: background .2s;
+}
+.playhint:hover { background: rgba(5, 6, 9, 0.2); }
+.playhint .pbtn {
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 12px 40px -8px rgba(240, 180, 41, 0.55);
+  position: relative;
+  transition: transform .15s;
+}
+.playhint:hover .pbtn { transform: scale(1.07); }
+.playhint .pbtn::after {
+  content: "";
+  position: absolute; top: 50%; left: 54%;
+  transform: translate(-50%, -50%);
+  border-style: solid;
+  border-width: 17px 0 17px 28px;
+  border-color: transparent transparent transparent var(--bg);
 }
 .frame video { display: block; width: 100%; height: auto; }
 .showcase .frame video { max-height: 74vh; object-fit: contain; }

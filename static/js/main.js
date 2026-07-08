@@ -37,11 +37,78 @@ function loadGalleryQueue() {
   pump();
 }
 
+// --- Autoplay robustness -----------------------------------------------
+// Some environments (Safari with "Never Auto-Play", macOS Low Power Mode,
+// blocking extensions, data-saver) refuse autoplay even for muted video.
+// Strategy: force muted before every play attempt, retry on media events,
+// unlock everything on the first user gesture, and if the hero is buffered
+// but still not playing, show an explicit play overlay.
+
+function tryPlay(v) {
+  v.muted = true;
+  v.defaultMuted = true;
+  return v.play().catch(() => {});
+}
+
+function unlockAllVideos() {
+  document.querySelectorAll("video").forEach((v) => {
+    const r = v.getBoundingClientRect();
+    const nearViewport = r.bottom > -400 && r.top < innerHeight + 400;
+    if (v === heroVideo || (nearViewport && v.getAttribute("src"))) tryPlay(v);
+  });
+}
+["pointerdown", "touchstart", "keydown", "wheel", "scroll"].forEach((ev) =>
+  addEventListener(ev, unlockAllVideos, { once: true, passive: true })
+);
+
+let heroOverlay = null;
+function showPlayOverlay() {
+  if (heroOverlay || !heroVideo || !heroVideo.paused) return;
+  heroOverlay = document.createElement("button");
+  heroOverlay.className = "playhint";
+  heroOverlay.setAttribute("aria-label", "Play video");
+  heroOverlay.innerHTML = '<span class="pbtn"></span>';
+  heroOverlay.addEventListener("click", () => { unlockAllVideos(); });
+  heroVideo.closest(".frame").appendChild(heroOverlay);
+}
+function hidePlayOverlay() {
+  if (heroOverlay) { heroOverlay.remove(); heroOverlay = null; }
+}
+
 if (heroVideo) {
-  heroVideo.play().catch(() => {});
-  heroVideo.addEventListener("canplay", () => heroVideo.play().catch(() => {}), { once: true });
-  heroVideo.addEventListener("canplaythrough", loadGalleryQueue, { once: true });
-  setTimeout(loadGalleryQueue, 8000); // last-resort fallback if the hero stalls
+  const frame = heroVideo.closest(".frame");
+  frame.dataset.loading = "1";
+
+  heroVideo.addEventListener("playing", () => {
+    delete frame.dataset.loading;
+    hidePlayOverlay();
+    loadGalleryQueue();
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && heroVideo.paused) tryPlay(heroVideo);
+  });
+
+  tryPlay(heroVideo);
+
+  // State-based watchdog (events can fire before this script runs, so we
+  // poll the readyState instead of relying on canplay/canplaythrough).
+  let ticks = 0;
+  const watchdog = setInterval(() => {
+    ticks++;
+    if (!heroVideo.paused) { clearInterval(watchdog); return; } // 'playing' handler did the rest
+    if (heroVideo.readyState >= 3) {
+      // Enough data to play, yet still paused: retry, and if the retry is
+      // rejected, autoplay is blocked - surface an explicit play button.
+      delete frame.dataset.loading;
+      const attempt = heroVideo.play();
+      heroVideo.muted = true;
+      if (attempt && attempt.catch) {
+        attempt.catch(() => { showPlayOverlay(); });
+      }
+      loadGalleryQueue();
+    }
+    if (ticks >= 8) { clearInterval(watchdog); loadGalleryQueue(); } // ~8s last resort
+  }, 1000);
 } else {
   loadGalleryQueue();
 }
@@ -54,7 +121,7 @@ const io = new IntersectionObserver(
       const v = entry.target;
       if (entry.isIntersecting) {
         if (v.dataset.src) loadVideo(v);
-        v.play().catch(() => {});
+        tryPlay(v);
       } else {
         v.pause();
       }
