@@ -306,6 +306,38 @@ h2 {
 .figrow { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
 .figrow .figblock { margin-bottom: 8px; }
 
+/* ---------- intent entropy chart ---------- */
+.gtchip { color: #ff2ec4; font-weight: 600; }
+.entropyChart {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px 24px 26px;
+}
+.entropyChart .chartTitle { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.entropyChart .chartTitle span {
+  display: block; font-weight: 400; font-size: 12.5px; color: var(--muted);
+  margin-top: 3px; line-height: 1.4;
+}
+.erow {
+  display: grid; grid-template-columns: 128px 1fr 46px;
+  align-items: center; gap: 12px; margin-top: 16px;
+}
+.elabel { font-size: 13.5px; color: var(--muted); text-align: right; line-height: 1.3; }
+.erow.ours .elabel { color: var(--text); font-weight: 600; }
+.etrack {
+  position: relative; height: 18px;
+  background: color-mix(in srgb, var(--line) 45%, transparent);
+  border-radius: 4px; overflow: hidden;
+}
+.ebar {
+  position: absolute; top: 0; bottom: 0; left: 0;
+  border-radius: 0 4px 4px 0;
+  background: var(--muted);
+}
+.erow.ours .ebar { background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+.eval { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--text); }
+
 /* ---------- tables ---------- */
 .tablewrap {
   overflow-x: auto;
@@ -414,4 +446,5 @@ footer p { color: var(--muted); font-size: 13.5px; max-width: 54em; margin: 0 au
   .cards, .grid, .figrow { grid-template-columns: 1fr; }
   .navlinks { display: none; }
   .tldr p { font-size: 17px; }
+  .erow { grid-template-columns: 104px 1fr 44px; }
 }

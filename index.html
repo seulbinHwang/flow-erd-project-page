@@ -21,6 +21,7 @@
     <a href="#leaderboard">Leaderboard</a>
     <a href="#gallery">Gallery</a>
     <a href="#diversity">Diversity</a>
+    <a href="#multimodality">Multimodality</a>
     <a href="#overview">Model</a>
     <a href="#bibtex">BibTeX</a>
   </div>
@@ -33,6 +34,7 @@
     <li><a href="#leaderboard">Leaderboard</a></li>
     <li><a href="#gallery">Rollout Gallery</a></li>
     <li><a href="#diversity">Diversity</a></li>
+    <li><a href="#multimodality">Multimodality</a></li>
     <li><a href="#overview">Model Overview</a></li>
     <li><a href="#ingredients">Two Ingredients</a></li>
     <li><a href="#abstract">Abstract</a></li>
@@ -259,8 +261,62 @@
   <p class="note">Highest diversity at the highest realism &mdash; every baseline trades one for the other.</p>
 </section>
 
+<section id="multimodality" class="band">
+  <h2><span class="secno">05</span>Intent-level multimodality</h2>
+  <p class="subtitle">Is the extra diversity meaningful, or just noise? &middot; 64 closed-loop rollouts per scene &middot; 1,048 WOMD validation scenes</p>
+
+  <figure class="figblock">
+    <div class="figpanel">
+      <img loading="lazy" decoding="async" src="static/figures/fig5_qualitative_intents.png"
+           alt="Qualitative comparison of 64 ego rollouts on the same intersection: SMART produces 60 straight and 4 left; Flow-ERD beta 1.0 produces 53 straight and 11 left; Flow-ERD beta 0.99 produces 48 straight, 14 left, and 2 U-turns">
+    </div>
+    <figcaption><strong>Same scene, 64 rollouts</strong> &mdash; ego trajectories overlaid on one WOSAC intersection and
+      colored by maneuver intent (<span class="gtchip">magenta</span> = logged ground truth).
+      SMART piles 60/64 rollouts onto the dominant straight mode. Flow-ERD &beta;&nbsp;=&nbsp;1.0 nearly triples the
+      left-turn mode, and &beta;&nbsp;=&nbsp;0.99 recovers even the rare U-turn &mdash; every branch a distinct,
+      physically plausible maneuver, not off-map drift.</figcaption>
+  </figure>
+
+  <div class="figrow">
+    <figure class="figblock">
+      <div class="entropyChart" role="img"
+           aria-label="Average per-scene intent entropy in nats: SMART 0.400, Flow-ERD beta 1.0 0.425, Flow-ERD beta 0.99 0.477">
+        <p class="chartTitle">Average per-scene intent entropy <span>Shannon entropy of ego-intent labels, in nats &middot; scale 0&ndash;0.5 &middot; higher = more balanced maneuvers</span></p>
+        <div class="erow" title="SMART: 0.400 nats">
+          <span class="elabel">SMART</span>
+          <div class="etrack"><div class="ebar" style="width:80%"></div></div>
+          <span class="eval">0.400</span>
+        </div>
+        <div class="erow ours" title="Flow-ERD &beta;=1.0: 0.425 nats">
+          <span class="elabel">Flow&#8209;ERD &beta;&nbsp;=&nbsp;1.0</span>
+          <div class="etrack"><div class="ebar" style="width:85%"></div></div>
+          <span class="eval">0.425</span>
+        </div>
+        <div class="erow ours" title="Flow-ERD &beta;=0.99: 0.477 nats">
+          <span class="elabel">Flow&#8209;ERD &beta;&nbsp;=&nbsp;0.99</span>
+          <div class="etrack"><div class="ebar" style="width:95.4%"></div></div>
+          <span class="eval">0.477</span>
+        </div>
+      </div>
+      <figcaption>Each ego rollout is labeled with the official WOMD trajectory-type rule; per-scene entropy is computed
+        over the moving intents (Straight / Left / Right / U&#8209;turn) and averaged over all 1,048 scenes.
+        Entropy rises monotonically as &beta; decreases.</figcaption>
+    </figure>
+    <article class="card">
+      <h3>Why RMM alone isn&rsquo;t enough</h3>
+      <p>
+        RMM scores rollouts against a <strong>single logged future</strong>, so it under-rewards rare but plausible
+        alternatives &mdash; a simulator can look perfectly realistic while collapsing onto the dominant mode.
+        Intent entropy shows the diversity Flow-ERD preserves is <strong>semantic</strong>: distinct maneuvers
+        available in the same scene, with the entropy temperature &beta; acting as a
+        <strong>direct dial</strong> between realism and mode coverage.
+      </p>
+    </article>
+  </div>
+</section>
+
 <section id="overview" class="band">
-  <h2><span class="secno">05</span>Model overview</h2>
+  <h2><span class="secno">06</span>Model overview</h2>
   <figure class="figblock">
     <div class="figpanel"><img loading="lazy" decoding="async" src="static/figures/fig2_overview.png" alt="Flow-ERD architecture: AFM backbone with type-specific kinematics, ERD fine-tuning with entropy-tempered target"></div>
     <figcaption><strong>(a)</strong> AFM generates continuous actions, executed through per-type kinematics.
@@ -269,7 +325,7 @@
 </section>
 
 <section id="ingredients" class="band">
-  <h2><span class="secno">06</span>Two ingredients</h2>
+  <h2><span class="secno">07</span>Two ingredients</h2>
   <div class="cards">
     <article class="card">
       <h3>AFM &mdash; Agent-Type Aware Flow Matching</h3>
@@ -292,7 +348,7 @@
 </section>
 
 <section id="abstract" class="band">
-  <h2><span class="secno">07</span>Abstract</h2>
+  <h2><span class="secno">08</span>Abstract</h2>
   <p class="abstract">
     Realistic and diverse traffic simulation is essential to autonomous driving development. Yet
     prevailing benchmarks predominantly reward realism, and recent methods have optimized accordingly,
@@ -309,7 +365,7 @@
 </section>
 
 <section id="bibtex" class="band">
-  <h2><span class="secno">08</span>BibTeX</h2>
+  <h2><span class="secno">09</span>BibTeX</h2>
   <!-- TODO: update once the arXiv preprint is available (add eprint number / journal). -->
   <pre class="bib"><code>@misc{hwang2026flowerd,
   title  = {Flow-ERD: Agent-type Aware Flow Matching with Entropy-Regularized
