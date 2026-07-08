@@ -12,6 +12,21 @@ const lazyVideos = [...document.querySelectorAll("video[data-src]")];
 
 let animMode = false;
 
+// Diagnostic overlay, only with ?debug=1 in the URL.
+const dbg = (() => {
+  if (!location.search.includes("debug=1")) return () => {};
+  const el = document.createElement("pre");
+  el.style.cssText = "position:fixed;top:70px;left:8px;z-index:9999;background:#000c;color:#0f0;" +
+    "font:12px/1.5 monospace;padding:8px 10px;border-radius:8px;max-width:520px;white-space:pre-wrap;";
+  document.body.appendChild(el);
+  const t0 = performance.now();
+  return (msg) => {
+    el.textContent += ((performance.now() - t0) / 1000).toFixed(1) + "s " + msg + "\n";
+    const lines = el.textContent.split("\n");
+    if (lines.length > 24) el.textContent = lines.slice(-24).join("\n");
+  };
+})();
+
 function animUrlFor(v) {
   const src = v.getAttribute("src") || v.dataset.src || "";
   const name = src.split("/").pop().split("?")[0].replace(/\.mp4$/, "");
@@ -34,30 +49,35 @@ function coverWithAnim(v) {
   fetch(animUrlFor(v))
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
     .then((blob) => {
+      dbg("blob ok " + (blob.size/1024|0) + "KB type=" + blob.type + " for " + animUrlFor(v).split("/").pop());
       delete frame.dataset.loading;
       try { v.pause(); } catch (e) { /* ignore */ }
       // A fresh object URL per cycle forces a fresh animation state -
       // reusing one URL would resume from the browser's decoded image
       // cache, which is already parked on the final frame.
-      let cur = null, curUrl = null;
+      let cur = null, curUrl = null, n = 0;
       const cycle = () => {
         if (!frame.isConnected) return;
+        if (v === heroVideo) dbg("cycle #" + (++n));
         const url = URL.createObjectURL(blob);
         const img = document.createElement("img");
         img.className = "vanim";
         img.alt = "";
         img.addEventListener("load", () => {
+          if (v === heroVideo) dbg("img load, swap");
           if (cur) { cur.remove(); URL.revokeObjectURL(curUrl); }
           cur = img;
           curUrl = url;
           setTimeout(cycle, ANIM_LOOP_MS);
         }, { once: true });
+        img.addEventListener("error", () => { if (v === heroVideo) dbg("img ERROR"); }, { once: true });
         img.src = url;
         frame.appendChild(img);
       };
       cycle();
     })
-    .catch(() => {
+    .catch((e) => {
+      dbg("fetch FAIL " + e);
       delete frame.dataset.loading;
       if (v === heroVideo) showPlayOverlay();
     });
@@ -66,6 +86,7 @@ function coverWithAnim(v) {
 function enableAnimMode() {
   if (animMode) return;
   animMode = true;
+  dbg("animMode ON");
   document.querySelectorAll("video").forEach(coverWithAnim);
 }
 
@@ -75,6 +96,7 @@ function tryPlay(v) {
   v.defaultMuted = true;
   const p = v.play();
   if (p && p.catch) p.catch((err) => {
+    dbg("play() rejected: " + (err && err.name) + " vis=" + document.visibilityState);
     if (err && err.name === "NotAllowedError" && document.visibilityState === "visible") {
       enableAnimMode();
     }
