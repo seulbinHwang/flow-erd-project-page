@@ -1,21 +1,43 @@
-// Lazy-load gallery videos and play/pause them as they enter/leave the viewport.
-const videos = document.querySelectorAll("video");
+// Videos: the hero loads first and starts immediately; once it can play
+// through (or after a short fallback), every gallery video is fetched
+// eagerly in the background so playback is instant when scrolled to.
+const heroVideo = document.querySelector(".showcase video");
+const lazyVideos = [...document.querySelectorAll("video[data-src]")];
 
+function eagerLoadAll() {
+  lazyVideos.forEach((v) => {
+    if (!v.getAttribute("src")) {
+      v.src = v.dataset.src;
+      v.preload = "auto";
+      v.load();
+    }
+  });
+}
+if (heroVideo) {
+  heroVideo.play().catch(() => {});
+  heroVideo.addEventListener("canplay", () => heroVideo.play().catch(() => {}), { once: true });
+  heroVideo.addEventListener("canplaythrough", eagerLoadAll, { once: true });
+  setTimeout(eagerLoadAll, 1500); // fallback if canplaythrough never fires
+} else {
+  eagerLoadAll();
+}
+
+// Play/pause videos as they enter/leave the viewport (they are already buffered).
 const io = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
       const v = entry.target;
       if (entry.isIntersecting) {
-        if (v.dataset.src && !v.src) v.src = v.dataset.src;
+        if (v.dataset.src && !v.getAttribute("src")) { v.src = v.dataset.src; v.load(); }
         v.play().catch(() => {});
       } else {
         v.pause();
       }
     });
   },
-  { rootMargin: "200px 0px", threshold: 0.05 }
+  { rootMargin: "300px 0px", threshold: 0.05 }
 );
-videos.forEach((v) => io.observe(v));
+document.querySelectorAll("video").forEach((v) => io.observe(v));
 
 // Reveal sections on scroll.
 const reveal = new IntersectionObserver(

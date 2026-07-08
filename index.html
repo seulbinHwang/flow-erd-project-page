@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,550;9..144,650&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="preload" href="static/videos/crosswalk_pedestrian_crossing.mp4" as="video" type="video/mp4">
   <link rel="stylesheet" href="static/css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128664;</text></svg>">
 </head>
@@ -63,13 +64,13 @@
 
   <figure class="showcase">
     <div class="frame">
-      <video src="static/videos/complex_intersection_signal_compliance_02.mp4"
-             poster="static/posters/complex_intersection_signal_compliance_02.jpg"
+      <video src="static/videos/crosswalk_pedestrian_crossing.mp4"
+             poster="static/posters/crosswalk_pedestrian_crossing.jpg"
              muted loop playsinline autoplay preload="auto"></video>
     </div>
     <figcaption>
-      Closed-loop multi-agent rollout by <strong>Flow-ERD</strong> &mdash; agents hold on red, launch on
-      green, and split into diverse maneuvers, all kinematically valid.
+      Closed-loop multi-agent rollout by <strong>Flow-ERD</strong> &mdash; pedestrians stream across the
+      crosswalk while vehicles slow and yield, every agent simulated jointly with type-correct motion.
     </figcaption>
   </figure>
 </header>
@@ -111,7 +112,7 @@
           <tr><th class="rank">#</th><th>Method</th><th>RMM&nbsp;&uarr;</th><th>Kinematic&nbsp;&uarr;</th><th>Interactive&nbsp;&uarr;</th><th>Map&nbsp;&uarr;</th><th class="dim">minADE&nbsp;&darr;</th></tr>
         </thead>
         <tbody>
-          <tr class="ours"><td class="rank">1</td><td><strong>Flow-ERD (7M)</strong><span class="tag">ours</span></td><td><u>0.7878</u></td><td><u>0.5062</u></td><td>0.8110</td><td>0.9190</td><td class="dim">1.2721</td></tr>
+          <tr class="ours"><td class="rank">1</td><td><strong>Flow-ERD (7M)</strong></td><td><u>0.7878</u></td><td><u>0.5062</u></td><td>0.8110</td><td>0.9190</td><td class="dim">1.2721</td></tr>
           <tr><td class="rank">2</td><td>Mhrnz</td><td>0.7865</td><td>0.4931</td><td>0.8143</td><td>0.9184</td><td class="dim">1.3051</td></tr>
           <tr><td class="rank">3</td><td>SMART-tiny-DecompGAIL</td><td>0.7864</td><td>0.4919</td><td><u>0.8152</u></td><td>0.9176</td><td class="dim">1.4209</td></tr>
           <tr><td class="rank">4</td><td>SMART-R1</td><td>0.7858</td><td>0.4944</td><td>0.8110</td><td>0.9201</td><td class="dim">1.2885</td></tr>
@@ -124,7 +125,7 @@
           <tr><td class="rank">11</td><td>SMART-tiny-CLSFT-RoaD</td><td>0.7847</td><td>0.4932</td><td>0.8106</td><td>0.9178</td><td class="dim">1.3042</td></tr>
           <tr><td class="rank">12</td><td>smart-CLSFT</td><td>0.7847</td><td>0.4933</td><td>0.8102</td><td>0.9183</td><td class="dim">1.3101</td></tr>
           <tr><td class="rank">13</td><td>SMART-tiny-CLSFT</td><td>0.7846</td><td>0.4931</td><td>0.8106</td><td>0.9177</td><td class="dim">1.3065</td></tr>
-          <tr class="ours"><td class="rank">14</td><td><strong>Flow Agents 7M</strong><span class="tag">ours</span><span class="sub">AFM backbone</span></td><td>0.7845</td><td>0.4955</td><td>0.8094</td><td>0.9178</td><td class="dim">1.3358</td></tr>
+          <tr class="ours"><td class="rank">14</td><td><strong>Flow Agents 7M</strong><span class="erd-note">+ ERD fine-tuning <span class="arrow">&rarr;</span> #1</span></td><td>0.7845</td><td>0.4955</td><td>0.8094</td><td>0.9178</td><td class="dim">1.3358</td></tr>
           <tr><td class="rank">15</td><td>MDG</td><td>0.7844</td><td>0.4928</td><td>0.8099</td><td>0.9183</td><td class="dim">1.3123</td></tr>
         </tbody>
       </table>
@@ -144,19 +145,19 @@
   <div class="grid">
     <figure class="cell wide">
       <div class="frame">
+        <video data-src="static/videos/complex_intersection_signal_compliance_02.mp4"
+               poster="static/posters/complex_intersection_signal_compliance_02.jpg"
+               muted loop playsinline preload="none"></video>
+      </div>
+      <figcaption><strong>Complex junction</strong> &mdash; queue on red, launch on green, split into diverse maneuvers.</figcaption>
+    </figure>
+    <figure class="cell wide">
+      <div class="frame">
         <video data-src="static/videos/complex_intersection_signal_compliance.mp4"
                poster="static/posters/complex_intersection_signal_compliance.jpg"
                muted loop playsinline preload="none"></video>
       </div>
       <figcaption><strong>Signal compliance</strong> &mdash; hold on red, clear on green.</figcaption>
-    </figure>
-    <figure class="cell wide">
-      <div class="frame">
-        <video data-src="static/videos/vehicle_yields_to_pedestrians_at_crowded_street_signal.mp4"
-               poster="static/posters/vehicle_yields_to_pedestrians_at_crowded_street_signal.jpg"
-               muted loop playsinline preload="none"></video>
-      </div>
-      <figcaption><strong>Yielding</strong> &mdash; the ego waits out a stream of crossing pedestrians.</figcaption>
     </figure>
   </div>
 
@@ -164,11 +165,11 @@
   <div class="grid">
     <figure class="cell">
       <div class="frame">
-        <video data-src="static/videos/crosswalk_pedestrian_crossing.mp4"
-               poster="static/posters/crosswalk_pedestrian_crossing.jpg"
+        <video data-src="static/videos/vehicle_yields_to_pedestrians_at_crowded_street_signal.mp4"
+               poster="static/posters/vehicle_yields_to_pedestrians_at_crowded_street_signal.jpg"
                muted loop playsinline preload="none"></video>
       </div>
-      <figcaption><strong>Crosswalk</strong> &mdash; vehicles slow while pedestrians cross freely.</figcaption>
+      <figcaption><strong>Yielding</strong> &mdash; the ego waits out a stream of crossing pedestrians.</figcaption>
     </figure>
     <figure class="cell">
       <div class="frame">
