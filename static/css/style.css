@@ -49,7 +49,7 @@ body {
 /* ---------- table of contents (left rail) ---------- */
 .toc {
   position: fixed;
-  left: max(20px, calc((100vw - var(--maxw)) / 2 - 230px));
+  left: 24px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 40;
@@ -395,10 +395,20 @@ tr.ours td.rank { color: var(--accent); font-weight: 700; }
   margin: 40px 0 18px;
 }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+/* let the gallery videos break out of the text column so they read larger */
+#gallery .grid {
+  width: min(1400px, calc(100vw - 48px));
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+@media (min-width: 1421px) {
+  /* keep clear of the fixed table of contents on the left */
+  #gallery .grid { width: clamp(1012px, calc(100vw - 480px), 1400px); }
+}
 .cell { display: flex; flex-direction: column; }
 .cell .frame { border-radius: 14px; }
 .cell .frame video { aspect-ratio: 1 / 1; object-fit: contain; }
-.cell.wide .frame video { aspect-ratio: 4 / 3; }
 .cell figcaption { color: var(--muted); font-size: 14px; margin: 12px 4px 0; }
 .cell figcaption strong { color: var(--text); }
 
