@@ -1,34 +1,59 @@
-// Videos: the hero loads first and starts immediately; once it can play
-// through (or after a short fallback), every gallery video is fetched
-// eagerly in the background so playback is instant when scrolled to.
+// Video loading strategy: the hero video gets the network to itself first.
+// Gallery videos start downloading only once the hero is fully buffered
+// (canplaythrough) and then load two at a time in DOM order, so nothing
+// competes with the hero and the clips nearest the viewport arrive first.
 const heroVideo = document.querySelector(".showcase video");
 const lazyVideos = [...document.querySelectorAll("video[data-src]")];
 
-function eagerLoadAll() {
-  lazyVideos.forEach((v) => {
-    if (!v.getAttribute("src")) {
-      v.src = v.dataset.src;
-      v.preload = "auto";
-      v.load();
-    }
-  });
+function loadVideo(v) {
+  if (v.dataset.poster && !v.poster) v.poster = v.dataset.poster;
+  if (v.getAttribute("src")) return false;
+  v.src = v.dataset.src;
+  v.preload = "auto";
+  v.load();
+  return true;
 }
+
+let queueStarted = false;
+function loadGalleryQueue() {
+  if (queueStarted) return;
+  queueStarted = true;
+  lazyVideos.forEach((v) => { if (v.dataset.poster && !v.poster) v.poster = v.dataset.poster; });
+  const queue = lazyVideos.slice();
+  let active = 0;
+  const pump = () => {
+    while (active < 2 && queue.length) {
+      const v = queue.shift();
+      if (v.getAttribute("src")) continue; // already loaded (e.g. scrolled into view)
+      active++;
+      let settled = false;
+      const done = () => { if (settled) return; settled = true; active--; pump(); };
+      v.addEventListener("canplaythrough", done, { once: true });
+      v.addEventListener("error", done, { once: true });
+      setTimeout(done, 10000); // never let one stalled file block the queue
+      loadVideo(v);
+    }
+  };
+  pump();
+}
+
 if (heroVideo) {
   heroVideo.play().catch(() => {});
   heroVideo.addEventListener("canplay", () => heroVideo.play().catch(() => {}), { once: true });
-  heroVideo.addEventListener("canplaythrough", eagerLoadAll, { once: true });
-  setTimeout(eagerLoadAll, 1500); // fallback if canplaythrough never fires
+  heroVideo.addEventListener("canplaythrough", loadGalleryQueue, { once: true });
+  setTimeout(loadGalleryQueue, 8000); // last-resort fallback if the hero stalls
 } else {
-  eagerLoadAll();
+  loadGalleryQueue();
 }
 
-// Play/pause videos as they enter/leave the viewport (they are already buffered).
+// Play/pause videos as they enter/leave the viewport. A video scrolled into
+// view before the queue reaches it jumps the queue and loads immediately.
 const io = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
       const v = entry.target;
       if (entry.isIntersecting) {
-        if (v.dataset.src && !v.getAttribute("src")) { v.src = v.dataset.src; v.load(); }
+        if (v.dataset.src) loadVideo(v);
         v.play().catch(() => {});
       } else {
         v.pause();
