@@ -1,9 +1,55 @@
 // Video loading strategy: the hero video gets the network to itself first.
-// Gallery videos start downloading only once the hero is fully buffered
-// (canplaythrough) and then load two at a time in DOM order, so nothing
-// competes with the hero and the clips nearest the viewport arrive first.
+// Gallery videos start downloading only once the hero is fully buffered,
+// then load two at a time in DOM order.
+//
+// Autoplay strategy: browsers that refuse muted-video autoplay (Safari with
+// "Never Auto-Play", Low Power Mode, blocking extensions) reject play() with
+// NotAllowedError. Animated images are NOT subject to autoplay policy, so in
+// that case every clip is covered with its animated-WebP twin, which always
+// plays. If a WebP fails to load, an explicit play button appears instead.
 const heroVideo = document.querySelector(".showcase video");
 const lazyVideos = [...document.querySelectorAll("video[data-src]")];
+
+let animMode = false;
+
+function animUrlFor(v) {
+  const src = v.getAttribute("src") || v.dataset.src || "";
+  const name = src.split("/").pop().split("?")[0].replace(/\.mp4$/, "");
+  return "static/anim/" + name + ".webp";
+}
+
+function coverWithAnim(v) {
+  const frame = v.closest(".frame");
+  if (!frame || frame.querySelector(".vanim")) return;
+  delete frame.dataset.loading;
+  const img = document.createElement("img");
+  img.className = "vanim";
+  img.alt = "";
+  img.decoding = "async";
+  img.loading = v === heroVideo ? "eager" : "lazy";
+  img.addEventListener("error", () => { img.remove(); if (v === heroVideo) showPlayOverlay(); });
+  img.src = animUrlFor(v);
+  frame.appendChild(img);
+  try { v.pause(); } catch (e) { /* ignore */ }
+}
+
+function enableAnimMode() {
+  if (animMode) return;
+  animMode = true;
+  document.querySelectorAll("video").forEach(coverWithAnim);
+}
+
+function tryPlay(v) {
+  if (animMode) return;
+  v.muted = true;
+  v.defaultMuted = true;
+  const p = v.play();
+  if (p && p.catch) p.catch((err) => {
+    if (err && err.name === "NotAllowedError" && document.visibilityState === "visible") {
+      enableAnimMode();
+    }
+  });
+}
 
 function loadVideo(v) {
   if (v.dataset.poster && !v.poster) v.poster = v.dataset.poster;
@@ -16,12 +62,13 @@ function loadVideo(v) {
 
 let queueStarted = false;
 function loadGalleryQueue() {
-  if (queueStarted) return;
+  if (queueStarted || animMode) return;
   queueStarted = true;
   lazyVideos.forEach((v) => { if (v.dataset.poster && !v.poster) v.poster = v.dataset.poster; });
   const queue = lazyVideos.slice();
   let active = 0;
   const pump = () => {
+    if (animMode) return;
     while (active < 2 && queue.length) {
       const v = queue.shift();
       if (v.getAttribute("src")) continue; // already loaded (e.g. scrolled into view)
@@ -37,20 +84,10 @@ function loadGalleryQueue() {
   pump();
 }
 
-// --- Autoplay robustness -----------------------------------------------
-// Some environments (Safari with "Never Auto-Play", macOS Low Power Mode,
-// blocking extensions, data-saver) refuse autoplay even for muted video.
-// Strategy: force muted before every play attempt, retry on media events,
-// unlock everything on the first user gesture, and if the hero is buffered
-// but still not playing, show an explicit play overlay.
-
-function tryPlay(v) {
-  v.muted = true;
-  v.defaultMuted = true;
-  return v.play().catch(() => {});
-}
-
+// First user gesture unlocks playback in environments that merely require
+// interaction (does nothing once anim mode has taken over).
 function unlockAllVideos() {
+  if (animMode) return;
   document.querySelectorAll("video").forEach((v) => {
     const r = v.getBoundingClientRect();
     const nearViewport = r.bottom > -400 && r.top < innerHeight + 400;
@@ -68,7 +105,11 @@ function showPlayOverlay() {
   heroOverlay.className = "playhint";
   heroOverlay.setAttribute("aria-label", "Play video");
   heroOverlay.innerHTML = '<span class="pbtn"></span>';
-  heroOverlay.addEventListener("click", () => { unlockAllVideos(); });
+  heroOverlay.addEventListener("click", () => {
+    heroVideo.muted = true;
+    heroVideo.play().catch(() => {});
+    document.querySelectorAll("video").forEach((v) => { v.muted = true; v.play().catch(() => {}); });
+  });
   heroVideo.closest(".frame").appendChild(heroOverlay);
 }
 function hidePlayOverlay() {
@@ -85,29 +126,27 @@ if (heroVideo) {
     loadGalleryQueue();
   });
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && heroVideo.paused) tryPlay(heroVideo);
+    if (!document.hidden && !animMode && heroVideo.paused) tryPlay(heroVideo);
   });
 
   tryPlay(heroVideo);
 
-  // State-based watchdog (events can fire before this script runs, so we
-  // poll the readyState instead of relying on canplay/canplaythrough).
+  // State-based watchdog (media events can fire before this script runs,
+  // so poll readyState instead of relying on canplay/canplaythrough).
   let ticks = 0;
   const watchdog = setInterval(() => {
     ticks++;
-    if (!heroVideo.paused) { clearInterval(watchdog); return; } // 'playing' handler did the rest
+    if (animMode || !heroVideo.isConnected) { clearInterval(watchdog); return; }
+    if (!heroVideo.paused) { clearInterval(watchdog); return; }
     if (heroVideo.readyState >= 3) {
-      // Enough data to play, yet still paused: retry, and if the retry is
-      // rejected, autoplay is blocked - surface an explicit play button.
+      // Enough data to play, yet still paused: one more attempt, and if it
+      // is rejected the animated fallback takes over via tryPlay's catch.
       delete frame.dataset.loading;
-      const attempt = heroVideo.play();
-      heroVideo.muted = true;
-      if (attempt && attempt.catch) {
-        attempt.catch(() => { showPlayOverlay(); });
-      }
+      tryPlay(heroVideo);
       loadGalleryQueue();
+      if (ticks >= 3) { clearInterval(watchdog); enableAnimMode(); }
     }
-    if (ticks >= 8) { clearInterval(watchdog); loadGalleryQueue(); } // ~8s last resort
+    if (ticks >= 8) { clearInterval(watchdog); loadGalleryQueue(); } // last resort
   }, 1000);
 } else {
   loadGalleryQueue();
@@ -119,6 +158,7 @@ const io = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
       const v = entry.target;
+      if (animMode) return;
       if (entry.isIntersecting) {
         if (v.dataset.src) loadVideo(v);
         tryPlay(v);

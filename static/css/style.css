@@ -177,6 +177,14 @@ a.btn:hover { border-color: var(--accent); transform: translateY(-1px); }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* animated-image fallback covering a video whose autoplay is blocked */
+.vanim {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
 /* explicit play button, shown only when autoplay is blocked */
 .playhint {
   position: absolute; inset: 0;
