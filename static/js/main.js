@@ -30,7 +30,7 @@ const dbg = (() => {
 function animUrlFor(v) {
   const src = v.getAttribute("src") || v.dataset.src || "";
   const name = src.split("/").pop().split("?")[0].replace(/\.mp4$/, "");
-  return "static/anim/" + name + ".webp?v=3";
+  return "static/anim/" + name + ".webp?v=4";
 }
 
 // Every clip is 91 frames x 50ms.
