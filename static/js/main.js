@@ -15,22 +15,50 @@ let animMode = false;
 function animUrlFor(v) {
   const src = v.getAttribute("src") || v.dataset.src || "";
   const name = src.split("/").pop().split("?")[0].replace(/\.mp4$/, "");
-  return "static/anim/" + name + ".webp?v=2";
+  return "static/anim/" + name + ".webp?v=3";
 }
 
+// Every clip is 91 frames x 50ms.
+const ANIM_LOOP_MS = 4550;
+
+// Some Safari configurations play animated images only ONCE (Reduce Motion /
+// auto-play-animated-images off), ignoring the loop count. So we fetch the
+// whole file first (no mid-download stutter), then re-insert a fresh <img>
+// from the cached blob at every loop boundary: each insertion replays the
+// animation once, which together makes a seamless endless loop everywhere.
 function coverWithAnim(v) {
   const frame = v.closest(".frame");
-  if (!frame || frame.querySelector(".vanim")) return;
-  delete frame.dataset.loading;
-  const img = document.createElement("img");
-  img.className = "vanim";
-  img.alt = "";
-  img.decoding = "async";
-  img.loading = v === heroVideo ? "eager" : "lazy";
-  img.addEventListener("error", () => { img.remove(); if (v === heroVideo) showPlayOverlay(); });
-  img.src = animUrlFor(v);
-  frame.appendChild(img);
-  try { v.pause(); } catch (e) { /* ignore */ }
+  if (!frame || frame.dataset.anim) return;
+  frame.dataset.anim = "1";
+  if (v === heroVideo) frame.dataset.loading = "1";
+  fetch(animUrlFor(v))
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
+    .then((blob) => {
+      const url = URL.createObjectURL(blob);
+      delete frame.dataset.loading;
+      try { v.pause(); } catch (e) { /* ignore */ }
+      let cur = null;
+      const cycle = () => {
+        if (!frame.isConnected) return;
+        const img = document.createElement("img");
+        img.className = "vanim";
+        img.alt = "";
+        img.src = url;
+        img.addEventListener("load", () => {
+          requestAnimationFrame(() => {
+            if (cur) cur.remove();
+            cur = img;
+            setTimeout(cycle, ANIM_LOOP_MS);
+          });
+        }, { once: true });
+        frame.appendChild(img);
+      };
+      cycle();
+    })
+    .catch(() => {
+      delete frame.dataset.loading;
+      if (v === heroVideo) showPlayOverlay();
+    });
 }
 
 function enableAnimMode() {
