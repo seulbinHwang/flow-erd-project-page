@@ -34,23 +34,25 @@ function coverWithAnim(v) {
   fetch(animUrlFor(v))
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
     .then((blob) => {
-      const url = URL.createObjectURL(blob);
       delete frame.dataset.loading;
       try { v.pause(); } catch (e) { /* ignore */ }
-      let cur = null;
+      // A fresh object URL per cycle forces a fresh animation state -
+      // reusing one URL would resume from the browser's decoded image
+      // cache, which is already parked on the final frame.
+      let cur = null, curUrl = null;
       const cycle = () => {
         if (!frame.isConnected) return;
+        const url = URL.createObjectURL(blob);
         const img = document.createElement("img");
         img.className = "vanim";
         img.alt = "";
-        img.src = url;
         img.addEventListener("load", () => {
-          requestAnimationFrame(() => {
-            if (cur) cur.remove();
-            cur = img;
-            setTimeout(cycle, ANIM_LOOP_MS);
-          });
+          if (cur) { cur.remove(); URL.revokeObjectURL(curUrl); }
+          cur = img;
+          curUrl = url;
+          setTimeout(cycle, ANIM_LOOP_MS);
         }, { once: true });
+        img.src = url;
         frame.appendChild(img);
       };
       cycle();
