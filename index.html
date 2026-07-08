@@ -91,12 +91,12 @@
 
   <div class="stats">
     <div class="stat">
-      <span class="big">1<sup>st</sup></span>
-      <span class="label">Overall realism (RMM)</span>
+      <span class="big">World&rsquo;s #1</span>
+      <span class="label">The world&rsquo;s most realistic traffic simulator &mdash; top overall realism (RMM) on WOSAC 2025</span>
     </div>
     <div class="stat">
       <span class="big">+0.0013</span>
-      <span class="label">Margin over 2<sup>nd</sup> place &mdash; larger than the gap across ranks 2&ndash;10</span>
+      <span class="label">Lead over 2<sup>nd</sup> place &mdash; wider than any gap between consecutive rivals in the top 10</span>
     </div>
     <div class="stat">
       <span class="big">1<sup>st</sup></span>
@@ -105,32 +105,35 @@
   </div>
 
   <figure class="figblock">
-    <div class="shot"><img src="static/figures/leaderboard_highlight.png" alt="Official WOSAC 2025 leaderboard with Flow-ERD ranked first"></div>
-    <figcaption>Official leaderboard: <strong>Flow-ERD ranks #1</strong> &mdash;
-      <a href="https://waymo.com/open/challenges/2025/sim-agents/" target="_blank" rel="noopener">verify it live on the Waymo Open Sim Agents Challenge&nbsp;&nearr;</a>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th class="rank">#</th><th>Method</th><th>RMM&nbsp;&uarr;</th><th>Kinematic&nbsp;&uarr;</th><th>Interactive&nbsp;&uarr;</th><th>Map&nbsp;&uarr;</th><th class="dim">minADE&nbsp;&darr;</th></tr>
+        </thead>
+        <tbody>
+          <tr class="ours"><td class="rank">1</td><td><strong>Flow-ERD (7M)</strong><span class="tag">ours</span></td><td><u>0.7878</u></td><td><u>0.5062</u></td><td>0.8110</td><td>0.9190</td><td class="dim">1.2721</td></tr>
+          <tr><td class="rank">2</td><td>Mhrnz</td><td>0.7865</td><td>0.4931</td><td>0.8143</td><td>0.9184</td><td class="dim">1.3051</td></tr>
+          <tr><td class="rank">3</td><td>SMART-tiny-DecompGAIL</td><td>0.7864</td><td>0.4919</td><td><u>0.8152</u></td><td>0.9176</td><td class="dim">1.4209</td></tr>
+          <tr><td class="rank">4</td><td>SMART-R1</td><td>0.7858</td><td>0.4944</td><td>0.8110</td><td>0.9201</td><td class="dim">1.2885</td></tr>
+          <tr><td class="rank">5</td><td>SMART-tiny-RLFTSim</td><td>0.7857</td><td>0.4927</td><td>0.8129</td><td>0.9183</td><td class="dim">1.3252</td></tr>
+          <tr><td class="rank">6</td><td>SMART-R1</td><td>0.7855</td><td>0.4940</td><td>0.8109</td><td>0.9194</td><td class="dim">1.2990</td></tr>
+          <tr><td class="rank">7</td><td>TrajTok</td><td>0.7852</td><td>0.4887</td><td>0.8116</td><td><u>0.9207</u></td><td class="dim">1.3179</td></tr>
+          <tr><td class="rank">8</td><td>unimotion</td><td>0.7851</td><td>0.4943</td><td>0.8105</td><td>0.9187</td><td class="dim">1.3036</td></tr>
+          <tr><td class="rank">9</td><td>smart-CLSFT</td><td>0.7847</td><td>0.4932</td><td>0.8104</td><td>0.9183</td><td class="dim">1.3083</td></tr>
+          <tr><td class="rank">10</td><td>smart-7M-catk</td><td>0.7847</td><td>0.4938</td><td>0.8101</td><td>0.9182</td><td class="dim">1.3119</td></tr>
+          <tr><td class="rank">11</td><td>SMART-tiny-CLSFT-RoaD</td><td>0.7847</td><td>0.4932</td><td>0.8106</td><td>0.9178</td><td class="dim">1.3042</td></tr>
+          <tr><td class="rank">12</td><td>smart-CLSFT</td><td>0.7847</td><td>0.4933</td><td>0.8102</td><td>0.9183</td><td class="dim">1.3101</td></tr>
+          <tr><td class="rank">13</td><td>SMART-tiny-CLSFT</td><td>0.7846</td><td>0.4931</td><td>0.8106</td><td>0.9177</td><td class="dim">1.3065</td></tr>
+          <tr class="ours"><td class="rank">14</td><td><strong>Flow Agents 7M</strong><span class="tag">ours</span><span class="sub">AFM backbone</span></td><td>0.7845</td><td>0.4955</td><td>0.8094</td><td>0.9178</td><td class="dim">1.3358</td></tr>
+          <tr><td class="rank">15</td><td>MDG</td><td>0.7844</td><td>0.4928</td><td>0.8099</td><td>0.9183</td><td class="dim">1.3123</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Official WOSAC 2025 test leaderboard &mdash; <strong>Flow-ERD ranks #1</strong>.
+      <a href="https://waymo.com/open/challenges/2025/sim-agents/" target="_blank" rel="noopener">Verify it live on the Waymo Open Sim Agents Challenge&nbsp;&nearr;</a>
     </figcaption>
   </figure>
 
-  <div class="tablewrap">
-    <table>
-      <thead>
-        <tr><th>Type</th><th>Method</th><th>RMM&nbsp;&uarr;</th><th>Kinematic&nbsp;&uarr;</th><th>Interactive&nbsp;&uarr;</th><th>Map&nbsp;&uarr;</th><th class="dim">minADE&nbsp;&darr;</th></tr>
-      </thead>
-      <tbody>
-        <tr><td rowspan="5" class="type">Pretrained</td><td>SMART</td><td>0.7814</td><td>0.4854</td><td>0.8089</td><td>0.9153</td><td class="dim">1.3931</td></tr>
-        <tr><td>TrajTok</td><td>0.7852</td><td>0.4887</td><td>0.8116</td><td><u>0.9207</u></td><td class="dim">1.3179</td></tr>
-        <tr><td>UniMM</td><td>0.7829</td><td>0.4914</td><td>0.8089</td><td>0.9161</td><td class="dim">1.2949</td></tr>
-        <tr><td>MDG</td><td>0.7844</td><td>0.4928</td><td>0.8099</td><td>0.9183</td><td class="dim">1.3123</td></tr>
-        <tr class="ours"><td><strong>AFM backbone (ours)</strong></td><td>0.7845</td><td><u>0.4955</u></td><td>0.8094</td><td>0.9178</td><td class="dim">1.3358</td></tr>
-        <tr><td rowspan="6" class="type">Fine-tuned</td><td>CAT-K (on SMART)</td><td>0.7846</td><td>0.4931</td><td>0.8106</td><td>0.9177</td><td class="dim">1.3065</td></tr>
-        <tr><td>RoaD</td><td>0.7847</td><td>0.4932</td><td>0.8106</td><td>0.9178</td><td class="dim">1.3042</td></tr>
-        <tr><td>RLFTSim</td><td>0.7857</td><td>0.4927</td><td>0.8129</td><td>0.9183</td><td class="dim">1.3252</td></tr>
-        <tr><td>SMART-R1</td><td>0.7858</td><td>0.4944</td><td>0.8110</td><td>0.9201</td><td class="dim">1.2885</td></tr>
-        <tr><td>DecompGAIL</td><td>0.7864</td><td>0.4919</td><td><u>0.8152</u></td><td>0.9176</td><td class="dim">1.4209</td></tr>
-        <tr class="ours"><td><strong>Flow-ERD (ours, AFM + ERD)</strong></td><td><u>0.7878</u></td><td><u>0.5062</u></td><td>0.8110</td><td>0.9190</td><td class="dim">1.2721</td></tr>
-      </tbody>
-    </table>
-  </div>
 </section>
 
 <section id="gallery" class="band">

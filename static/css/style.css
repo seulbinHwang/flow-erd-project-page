@@ -292,6 +292,18 @@ td.dim, th.dim { color: color-mix(in srgb, var(--muted) 55%, transparent); }
 tr.ours td.dim { color: color-mix(in srgb, var(--muted) 80%, transparent); }
 th.hl, td.hl { border-left: 1px solid var(--line); }
 th.hl { color: var(--accent-2); }
+td.rank, th.rank { text-align: center; width: 46px; color: var(--muted); }
+tr.ours td.rank { color: var(--accent); font-weight: 700; }
+.tag {
+  display: inline-block;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .07em; text-transform: uppercase;
+  color: var(--bg); background: var(--accent);
+  padding: 1px 7px; border-radius: 999px;
+  margin-left: 8px; vertical-align: middle;
+}
+td .sub { color: var(--muted); font-size: 12px; margin-left: 8px; }
+tr.ours td .sub { color: color-mix(in srgb, var(--muted) 90%, var(--text)); }
 
 /* ---------- gallery ---------- */
 .groupTitle {
