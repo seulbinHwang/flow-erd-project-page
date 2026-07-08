@@ -15,7 +15,7 @@ let animMode = false;
 function animUrlFor(v) {
   const src = v.getAttribute("src") || v.dataset.src || "";
   const name = src.split("/").pop().split("?")[0].replace(/\.mp4$/, "");
-  return "static/anim/" + name + ".webp";
+  return "static/anim/" + name + ".webp?v=2";
 }
 
 function coverWithAnim(v) {
