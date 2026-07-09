@@ -12,9 +12,8 @@ python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
-## Before going public
+Live: https://seulbinhwang.github.io/flow-erd-project-page/ · Paper: https://arxiv.org/abs/2607.06957
 
-- [ ] `index.html`: replace the **Paper** button placeholder with the real arXiv link
-      and update the BibTeX entry (search for `TODO`).
-- [ ] When the code is released: activate the **Code** link.
-- [ ] Repo Settings → Pages → deploy from `main` / root, then flip the repo to **Public**.
+## Remaining
+
+- [ ] When the code is released: activate the **Code** link in `index.html`.
