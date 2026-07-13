@@ -101,15 +101,15 @@ function enableAnimMode() {
 }
 
 function tryPlay(v) {
-  if (animMode) return;
+  // Just attempt playback. Do NOT give up / switch to a fallback on the
+  // first rejection: Safari often refuses autoplay for a beat right after
+  // load (tab still settling) and then allows it a moment later. The retry
+  // scheduler below keeps trying; the fallback only fires after real failure.
   v.muted = true;
   v.defaultMuted = true;
   const p = v.play();
   if (p && p.catch) p.catch((err) => {
     dbg("play() rejected: " + (err && err.name) + " vis=" + document.visibilityState);
-    if (err && err.name === "NotAllowedError" && document.visibilityState === "visible") {
-      enableAnimMode();
-    }
   });
 }
 
@@ -241,31 +241,37 @@ if (heroVideo) {
     if (!document.hidden && !animMode && heroVideo.paused) tryPlay(heroVideo);
   });
 
-  // Hero1 has a native src + autoplay (robust: the browser shows the poster
-  // and attempts playback even before this script runs). We also call
-  // tryPlay to catch a blocked autoplay. Other videos load only after hero1
-  // is fully buffered, so nothing competes for bandwidth mid-playback.
-  tryPlay(heroVideo);
+  // Retry playing any in-view hero. Autoplay is frequently refused for a
+  // beat right after load (tab still settling / visibility flipping), so we
+  // retry hard on timers, on visibility change, on window load, and on the
+  // first user gesture instead of giving up.
+  function retryHeroes() {
+    document.querySelectorAll(".showcase video").forEach((v) => {
+      if (!v.getAttribute("src")) return;
+      const r = v.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < window.innerHeight && v.paused) tryPlay(v);
+    });
+  }
+  [0, 120, 300, 600, 1000, 1600, 2400, 3400, 4500].forEach((ms) => setTimeout(retryHeroes, ms));
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) retryHeroes(); });
+  window.addEventListener("load", retryHeroes);
+  ["pointerdown", "touchstart", "keydown", "wheel", "scroll", "mousemove"].forEach((ev) =>
+    addEventListener(ev, retryHeroes, { passive: true }));
+
+  // Load hero2 + gallery only after hero1 is fully buffered (no contention).
   whenFullyBuffered(heroVideo, startSecondaryThenGallery, 15000);
 
-  // If hero1 is buffered but still paused, autoplay is blocked: show the
-  // play button(s) so one click plays every hero as full-quality video.
-  let ticks = 0;
-  const watchdog = setInterval(() => {
-    ticks++;
-    if (animMode || !heroVideo.isConnected || !heroVideo.paused) { clearInterval(watchdog); return; }
-    if (heroVideo.readyState >= 3) {
-      delete frame.dataset.loading;
-      tryPlay(heroVideo);
-      if (ticks >= 3) {
-        clearInterval(watchdog);
-        showPlayOverlay(heroVideo);
-        if (secondHero) showPlayOverlay(secondHero);
-        enableAnimMode(); // gallery falls back to WebP; heroes show play buttons
-      }
+  // Last resort: if hero1 genuinely won't autoplay after all retries, show a
+  // play button on each hero (one click plays every hero as HQ video) and let
+  // the gallery use its WebP fallback. Heroes NEVER use the WebP.
+  setTimeout(() => {
+    if (!heroVideo.isConnected) return;
+    delete frame.dataset.loading;
+    if (heroVideo.paused && document.visibilityState === "visible") {
+      document.querySelectorAll(".showcase video").forEach((v) => showPlayOverlay(v));
+      enableAnimMode();
     }
-    if (ticks >= 20) clearInterval(watchdog);
-  }, 1000);
+  }, 6000);
 } else {
   loadGalleryQueue();
 }
