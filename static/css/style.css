@@ -1,13 +1,13 @@
 :root {
-  --bg: #0a0c10;
-  --bg-soft: #10131a;
-  --panel: #12151d;
-  --line: #232836;
-  --text: #e9e6de;
-  --muted: #9aa0ad;
+  --bg: #0c0f12;
+  --bg-soft: #12161b;
+  --panel: #161b21;
+  --line: #253039;
+  --text: #e7edf1;
+  --muted: #93a3b0;
   --accent: #f0b429;
   --accent-2: #ffd97a;
-  --ego: #3ee6e0;
+  --ego: #34e2e2;
   --maxw: 1060px;
 }
 
@@ -408,7 +408,7 @@ tr.ours td.rank { color: var(--accent); font-weight: 700; }
 }
 .cell { display: flex; flex-direction: column; }
 .cell .frame { border-radius: 14px; }
-.cell .frame video { aspect-ratio: 1 / 1; object-fit: contain; }
+.cell .frame video { aspect-ratio: 16 / 9; object-fit: cover; }
 .cell figcaption { color: var(--muted); font-size: 14px; margin: 12px 4px 0; }
 .cell figcaption strong { color: var(--text); }
 
