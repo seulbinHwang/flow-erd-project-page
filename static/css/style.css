@@ -125,6 +125,17 @@ h1 {
 .authors { color: var(--text); font-size: 16.5px; margin-bottom: 8px; }
 .authors sup { color: var(--accent); font-size: .7em; }
 .authors .dot { margin: 0 10px; color: var(--muted); }
+.author-link {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 65%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: color .15s, text-decoration-color .15s;
+}
+.author-link:hover { color: var(--accent); text-decoration-color: var(--accent); }
+.author-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+.author-link .external-mark { color: var(--accent); font-size: .75em; margin-left: 4px; vertical-align: .18em; }
 .affil { color: var(--muted); font-size: 14.5px; margin-bottom: 28px; }
 .affil .contrib { display: block; font-size: 12.5px; margin-top: 4px; }
 .affil .contrib sup { color: var(--accent); }
@@ -155,6 +166,19 @@ a.btn:hover { border-color: var(--accent); transform: translateY(-1px); }
 /* ---------- video frames ---------- */
 .showcase { margin: 0 auto; max-width: 940px; }
 .showcase-2 { margin-top: 30px; }
+.showcase-intro {
+  margin: 0 6px 12px;
+  padding: 11px 14px;
+  color: var(--text);
+  font-size: clamp(15px, 1.6vw, 17px);
+  line-height: 1.5;
+  text-align: left;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+}
+.showcase-intro strong { color: var(--accent); margin-right: .3em; }
 .frame {
   position: relative;
   background: #000;
