@@ -30,11 +30,11 @@ const dbg = (() => {
 function animUrlFor(v) {
   const src = v.getAttribute("src") || v.dataset.src || "";
   const name = src.split("/").pop().split("?")[0].replace(/\.mp4$/, "");
-  return "static/anim/" + name + ".webp?v=11";
+  return "static/anim/" + name + ".webp?v=12";
 }
 
-// Every clip is 91 frames x 50ms.
-const ANIM_LOOP_MS = 4550;
+// Fallback re-insert interval when a clip has no data-anim-ms (ms).
+const ANIM_LOOP_MS = 9000;
 
 // Some Safari configurations play animated images only ONCE (Reduce Motion /
 // auto-play-animated-images off), ignoring the loop count. So we fetch the
@@ -55,10 +55,11 @@ function coverWithAnim(v) {
       // A fresh object URL per cycle forces a fresh animation state -
       // reusing one URL would resume from the browser's decoded image
       // cache, which is already parked on the final frame.
+      const loopMs = parseInt(v.dataset.animMs, 10) || ANIM_LOOP_MS;
       let cur = null, curUrl = null, n = 0;
       const cycle = () => {
         if (!frame.isConnected) return;
-        if (v === heroVideo) dbg("cycle #" + (++n));
+        if (v === heroVideo) dbg("cycle #" + (++n) + " loopMs=" + loopMs);
         const url = URL.createObjectURL(blob);
         const img = document.createElement("img");
         img.className = "vanim";
@@ -68,7 +69,7 @@ function coverWithAnim(v) {
           if (cur) { cur.remove(); URL.revokeObjectURL(curUrl); }
           cur = img;
           curUrl = url;
-          setTimeout(cycle, ANIM_LOOP_MS);
+          setTimeout(cycle, loopMs);
         }, { once: true });
         img.addEventListener("error", () => { if (v === heroVideo) dbg("img ERROR"); }, { once: true });
         img.src = url;
