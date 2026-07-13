@@ -154,6 +154,7 @@ a.btn:hover { border-color: var(--accent); transform: translateY(-1px); }
 
 /* ---------- video frames ---------- */
 .showcase { margin: 0 auto; max-width: 940px; }
+.showcase-2 { margin-top: 30px; }
 .frame {
   position: relative;
   background: #000;

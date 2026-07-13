@@ -8,7 +8,8 @@
 // that case every clip is covered with its animated-WebP twin, which always
 // plays. If a WebP fails to load, an explicit play button appears instead.
 const heroVideo = document.querySelector(".showcase video");
-const lazyVideos = [...document.querySelectorAll("video[data-src]")];
+const secondHero = document.querySelector(".showcase-2 video");
+const lazyVideos = [...document.querySelectorAll("#gallery video[data-src]")];
 
 let animMode = false;
 
@@ -113,6 +114,22 @@ function loadVideo(v) {
   return true;
 }
 
+// After the first hero is playing, load the second showcase video (so it
+// never competes with the first for bandwidth), then start the gallery.
+let secondaryStarted = false;
+function startSecondaryThenGallery() {
+  if (secondaryStarted) return;
+  secondaryStarted = true;
+  if (!secondHero || animMode) { loadGalleryQueue(); return; }
+  delete secondHero.dataset.defer;
+  loadVideo(secondHero);
+  tryPlay(secondHero);
+  let advanced = false;
+  const go = () => { if (advanced) return; advanced = true; loadGalleryQueue(); };
+  secondHero.addEventListener("canplaythrough", go, { once: true });
+  setTimeout(go, 4000); // don't let a slow second hero block the gallery
+}
+
 let queueStarted = false;
 function loadGalleryQueue() {
   if (queueStarted || animMode) return;
@@ -176,7 +193,7 @@ if (heroVideo) {
   heroVideo.addEventListener("playing", () => {
     delete frame.dataset.loading;
     hidePlayOverlay();
-    loadGalleryQueue();
+    startSecondaryThenGallery();
   });
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden && !animMode && heroVideo.paused) tryPlay(heroVideo);
@@ -196,10 +213,10 @@ if (heroVideo) {
       // is rejected the animated fallback takes over via tryPlay's catch.
       delete frame.dataset.loading;
       tryPlay(heroVideo);
-      loadGalleryQueue();
+      startSecondaryThenGallery();
       if (ticks >= 3) { clearInterval(watchdog); enableAnimMode(); }
     }
-    if (ticks >= 8) { clearInterval(watchdog); loadGalleryQueue(); } // last resort
+    if (ticks >= 8) { clearInterval(watchdog); startSecondaryThenGallery(); } // last resort
   }, 1000);
 } else {
   loadGalleryQueue();
@@ -212,6 +229,7 @@ const io = new IntersectionObserver(
     entries.forEach((entry) => {
       const v = entry.target;
       if (animMode) return;
+      if (v.dataset.defer) return; // not unlocked yet (second hero waits for the first)
       if (entry.isIntersecting) {
         if (v.dataset.src) loadVideo(v);
         tryPlay(v);
