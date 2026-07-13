@@ -31,7 +31,7 @@ const dbg = (() => {
 function animUrlFor(v) {
   const src = v.getAttribute("src") || v.dataset.src || "";
   const name = src.split("/").pop().split("?")[0].replace(/\.mp4$/, "");
-  return "static/anim/" + name + ".webp?v=14";
+  return "static/anim/" + name + ".webp?v=15";
 }
 
 // Fallback re-insert interval when a clip has no data-anim-ms (ms).
@@ -58,7 +58,7 @@ function coverWithAnim(v) {
       const loopMs = parseInt(v.dataset.animMs, 10) || ANIM_LOOP_MS;
       let cur = null, curUrl = null, n = 0;
       const cycle = () => {
-        if (!frame.isConnected) return;
+        if (!frame.isConnected || frame.dataset.stopAnim) return;
         if (v === heroVideo) dbg("cycle #" + (++n) + " loopMs=" + loopMs);
         const url = URL.createObjectURL(blob);
         const img = document.createElement("img");
@@ -195,15 +195,36 @@ function unlockAllVideos() {
   addEventListener(ev, unlockAllVideos, { once: true, passive: true })
 );
 
+// Animated WebP is CPU-decoded and can look choppy for long HD clips. A real
+// <video> is hardware-decoded (smooth), but Safari blocks its autoplay on
+// some sites. A user gesture, however, unlocks video playback. So the moment
+// the user interacts at all, swap the heroes from their WebP fallback to the
+// real, smooth, full-quality video.
+let heroesUpgraded = false;
+function upgradeHeroesToVideo() {
+  if (heroesUpgraded) return;
+  heroesUpgraded = true;
+  document.querySelectorAll(".showcase").forEach((sc) => {
+    const frame = sc.querySelector(".frame");
+    const v = sc.querySelector("video");
+    if (!frame || !v) return;
+    frame.dataset.stopAnim = "1"; // halt the WebP re-insertion loop
+    frame.querySelectorAll("img.vanim, .playhint").forEach((el) => el.remove());
+    if (!v.getAttribute("src") && v.dataset.src) loadVideo(v);
+    v.muted = true;
+    v.defaultMuted = true;
+    v.play().catch(() => {});
+  });
+}
+["pointerdown", "touchstart", "keydown", "click", "wheel"].forEach((ev) =>
+  addEventListener(ev, upgradeHeroesToVideo, { passive: true })
+);
+
 // Play button shown on a hero when autoplay is blocked. Clicking any hero's
 // button counts as a user gesture that unlocks playback for the whole page,
 // so we play EVERY hero as full-quality video and drop all the buttons.
 function playAllHeroes() {
-  document.querySelectorAll(".showcase video").forEach((v) => {
-    v.muted = true;
-    if (!v.getAttribute("src") && v.dataset.src) loadVideo(v);
-    v.play().catch(() => {});
-  });
+  upgradeHeroesToVideo();
   hidePlayOverlay();
 }
 function showPlayOverlay(video) {
