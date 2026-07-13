@@ -114,8 +114,29 @@ function loadVideo(v) {
   return true;
 }
 
-// After the first hero is playing, load the second showcase video (so it
-// never competes with the first for bandwidth), then start the gallery.
+// Call cb once v has buffered essentially its whole duration (fully
+// downloaded), so nothing else touches the network while it is still
+// filling its buffer. Falls back after maxWait so we never stall forever.
+function whenFullyBuffered(v, cb, maxWait) {
+  let done = false;
+  const fire = () => { if (done) return; done = true; cb(); };
+  const ok = () => {
+    const d = v.duration;
+    if (!d || isNaN(d)) return false;
+    for (let i = 0; i < v.buffered.length; i++) {
+      if (v.buffered.end(i) >= d - 0.6) return true;
+    }
+    return false;
+  };
+  if (ok()) { fire(); return; }
+  const iv = setInterval(() => { if (animMode || ok()) { clearInterval(iv); fire(); } }, 250);
+  setTimeout(() => { clearInterval(iv); fire(); }, maxWait || 15000);
+}
+
+// Load the second showcase only after the first hero is fully buffered
+// (so it never steals bandwidth mid-playback), then likewise gate the
+// gallery on the second hero. This keeps the visible hero perfectly
+// smooth instead of stuttering under concurrent downloads.
 let secondaryStarted = false;
 function startSecondaryThenGallery() {
   if (secondaryStarted) return;
@@ -124,10 +145,7 @@ function startSecondaryThenGallery() {
   delete secondHero.dataset.defer;
   loadVideo(secondHero);
   tryPlay(secondHero);
-  let advanced = false;
-  const go = () => { if (advanced) return; advanced = true; loadGalleryQueue(); };
-  secondHero.addEventListener("canplaythrough", go, { once: true });
-  setTimeout(go, 4000); // don't let a slow second hero block the gallery
+  whenFullyBuffered(secondHero, loadGalleryQueue, 12000);
 }
 
 let queueStarted = false;
@@ -193,13 +211,15 @@ if (heroVideo) {
   heroVideo.addEventListener("playing", () => {
     delete frame.dataset.loading;
     hidePlayOverlay();
-    startSecondaryThenGallery();
   });
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden && !animMode && heroVideo.paused) tryPlay(heroVideo);
   });
 
   tryPlay(heroVideo);
+  // Defer ALL other video loading until the visible hero is fully buffered,
+  // so its playback never stutters under concurrent downloads.
+  whenFullyBuffered(heroVideo, startSecondaryThenGallery, 15000);
 
   // State-based watchdog (media events can fire before this script runs,
   // so poll readyState instead of relying on canplay/canplaythrough).
@@ -213,7 +233,6 @@ if (heroVideo) {
       // is rejected the animated fallback takes over via tryPlay's catch.
       delete frame.dataset.loading;
       tryPlay(heroVideo);
-      startSecondaryThenGallery();
       if (ticks >= 3) { clearInterval(watchdog); enableAnimMode(); }
     }
     if (ticks >= 8) { clearInterval(watchdog); startSecondaryThenGallery(); } // last resort
