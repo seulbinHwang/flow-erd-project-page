@@ -45,8 +45,16 @@ const ANIM_LOOP_MS = 9000;
 function coverWithAnim(v) {
   const frame = v.closest(".frame");
   if (!frame || frame.dataset.anim) return;
+  // Heroes never use the low-quality animated WebP. If their video can't
+  // autoplay, show a play button that plays the full-quality video instead
+  // (one click unlocks and plays every hero as HQ video).
+  if (v.closest(".showcase")) {
+    frame.dataset.anim = "1";
+    delete frame.dataset.loading;
+    showPlayOverlay(v);
+    return;
+  }
   frame.dataset.anim = "1";
-  if (v === heroVideo) frame.dataset.loading = "1";
   fetch(animUrlFor(v))
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
     .then((blob) => {
@@ -197,22 +205,32 @@ function unlockAllVideos() {
   addEventListener(ev, unlockAllVideos, { once: true, passive: true })
 );
 
-let heroOverlay = null;
-function showPlayOverlay() {
-  if (heroOverlay || !heroVideo || !heroVideo.paused) return;
-  heroOverlay = document.createElement("button");
-  heroOverlay.className = "playhint";
-  heroOverlay.setAttribute("aria-label", "Play video");
-  heroOverlay.innerHTML = '<span class="pbtn"></span>';
-  heroOverlay.addEventListener("click", () => {
-    heroVideo.muted = true;
-    heroVideo.play().catch(() => {});
-    document.querySelectorAll("video").forEach((v) => { v.muted = true; v.play().catch(() => {}); });
+// Play button shown on a hero when autoplay is blocked. Clicking any hero's
+// button counts as a user gesture that unlocks playback for the whole page,
+// so we play EVERY hero as full-quality video and drop all the buttons.
+function playAllHeroes() {
+  document.querySelectorAll(".showcase video").forEach((v) => {
+    v.muted = true;
+    if (!v.getAttribute("src") && v.dataset.src) {
+      blobLoad(v).then(() => v.play().catch(() => {})).catch(() => {});
+    } else {
+      v.play().catch(() => {});
+    }
   });
-  heroVideo.closest(".frame").appendChild(heroOverlay);
+  hidePlayOverlay();
+}
+function showPlayOverlay(video) {
+  const frame = (video || heroVideo) && (video || heroVideo).closest(".frame");
+  if (!frame || frame.querySelector(".playhint")) return;
+  const btn = document.createElement("button");
+  btn.className = "playhint";
+  btn.setAttribute("aria-label", "Play video");
+  btn.innerHTML = '<span class="pbtn"></span>';
+  btn.addEventListener("click", playAllHeroes);
+  frame.appendChild(btn);
 }
 function hidePlayOverlay() {
-  if (heroOverlay) { heroOverlay.remove(); heroOverlay = null; }
+  document.querySelectorAll(".playhint").forEach((b) => b.remove());
 }
 
 if (heroVideo) {
