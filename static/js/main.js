@@ -161,10 +161,9 @@ function startSecondaryThenGallery() {
   secondaryStarted = true;
   if (!secondHero || animMode) { loadGalleryQueue(); return; }
   delete secondHero.dataset.defer;
-  if (secondHero.dataset.poster && !secondHero.poster) secondHero.poster = secondHero.dataset.poster;
-  blobLoad(secondHero)
-    .then(() => { if (!animMode) tryPlay(secondHero); loadGalleryQueue(); })
-    .catch(() => { loadVideo(secondHero); if (!animMode) tryPlay(secondHero); loadGalleryQueue(); });
+  loadVideo(secondHero);
+  if (!animMode) tryPlay(secondHero);
+  whenFullyBuffered(secondHero, loadGalleryQueue, 12000);
 }
 
 let queueStarted = false;
@@ -211,11 +210,8 @@ function unlockAllVideos() {
 function playAllHeroes() {
   document.querySelectorAll(".showcase video").forEach((v) => {
     v.muted = true;
-    if (!v.getAttribute("src") && v.dataset.src) {
-      blobLoad(v).then(() => v.play().catch(() => {})).catch(() => {});
-    } else {
-      v.play().catch(() => {});
-    }
+    if (!v.getAttribute("src") && v.dataset.src) loadVideo(v);
+    v.play().catch(() => {});
   });
   hidePlayOverlay();
 }
@@ -245,24 +241,28 @@ if (heroVideo) {
     if (!document.hidden && !animMode && heroVideo.paused) tryPlay(heroVideo);
   });
 
-  if (heroVideo.dataset.poster && !heroVideo.poster) heroVideo.poster = heroVideo.dataset.poster;
-  // Fully download hero1 into memory, THEN play (blob playback can't stall
-  // on the network), THEN load hero2, THEN the gallery - strictly one at a
-  // time so nothing ever competes for bandwidth mid-playback.
-  blobLoad(heroVideo)
-    .then(() => { if (!animMode) tryPlay(heroVideo); startSecondaryThenGallery(); })
-    .catch(() => { loadVideo(heroVideo); if (!animMode) tryPlay(heroVideo); startSecondaryThenGallery(); });
+  // Hero1 has a native src + autoplay (robust: the browser shows the poster
+  // and attempts playback even before this script runs). We also call
+  // tryPlay to catch a blocked autoplay. Other videos load only after hero1
+  // is fully buffered, so nothing competes for bandwidth mid-playback.
+  tryPlay(heroVideo);
+  whenFullyBuffered(heroVideo, startSecondaryThenGallery, 15000);
 
-  // Autoplay-blocked detection: if hero1 is buffered enough but never
-  // starts, fall back to the animated-WebP path.
+  // If hero1 is buffered but still paused, autoplay is blocked: show the
+  // play button(s) so one click plays every hero as full-quality video.
   let ticks = 0;
   const watchdog = setInterval(() => {
     ticks++;
     if (animMode || !heroVideo.isConnected || !heroVideo.paused) { clearInterval(watchdog); return; }
-    if (heroVideo.getAttribute("src") && heroVideo.readyState >= 3) {
+    if (heroVideo.readyState >= 3) {
       delete frame.dataset.loading;
       tryPlay(heroVideo);
-      if (ticks >= 4) { clearInterval(watchdog); enableAnimMode(); }
+      if (ticks >= 3) {
+        clearInterval(watchdog);
+        showPlayOverlay(heroVideo);
+        if (secondHero) showPlayOverlay(secondHero);
+        enableAnimMode(); // gallery falls back to WebP; heroes show play buttons
+      }
     }
     if (ticks >= 20) clearInterval(watchdog);
   }, 1000);
