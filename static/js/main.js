@@ -114,6 +114,16 @@ function loadVideo(v) {
   return true;
 }
 
+// Fully download a clip into memory and play it from a blob URL. Blob
+// playback can never stall on the network, so the video is guaranteed
+// smooth once it starts. Returns a promise that resolves when ready.
+function blobLoad(v) {
+  const url = v.dataset.src || v.getAttribute("src");
+  return fetch(url)
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
+    .then((b) => { v.src = URL.createObjectURL(b); v.load(); return v; });
+}
+
 // Call cb once v has buffered essentially its whole duration (fully
 // downloaded), so nothing else touches the network while it is still
 // filling its buffer. Falls back after maxWait so we never stall forever.
@@ -143,9 +153,10 @@ function startSecondaryThenGallery() {
   secondaryStarted = true;
   if (!secondHero || animMode) { loadGalleryQueue(); return; }
   delete secondHero.dataset.defer;
-  loadVideo(secondHero);
-  tryPlay(secondHero);
-  whenFullyBuffered(secondHero, loadGalleryQueue, 12000);
+  if (secondHero.dataset.poster && !secondHero.poster) secondHero.poster = secondHero.dataset.poster;
+  blobLoad(secondHero)
+    .then(() => { if (!animMode) tryPlay(secondHero); loadGalleryQueue(); })
+    .catch(() => { loadVideo(secondHero); if (!animMode) tryPlay(secondHero); loadGalleryQueue(); });
 }
 
 let queueStarted = false;
@@ -216,26 +227,26 @@ if (heroVideo) {
     if (!document.hidden && !animMode && heroVideo.paused) tryPlay(heroVideo);
   });
 
-  tryPlay(heroVideo);
-  // Defer ALL other video loading until the visible hero is fully buffered,
-  // so its playback never stutters under concurrent downloads.
-  whenFullyBuffered(heroVideo, startSecondaryThenGallery, 15000);
+  if (heroVideo.dataset.poster && !heroVideo.poster) heroVideo.poster = heroVideo.dataset.poster;
+  // Fully download hero1 into memory, THEN play (blob playback can't stall
+  // on the network), THEN load hero2, THEN the gallery - strictly one at a
+  // time so nothing ever competes for bandwidth mid-playback.
+  blobLoad(heroVideo)
+    .then(() => { if (!animMode) tryPlay(heroVideo); startSecondaryThenGallery(); })
+    .catch(() => { loadVideo(heroVideo); if (!animMode) tryPlay(heroVideo); startSecondaryThenGallery(); });
 
-  // State-based watchdog (media events can fire before this script runs,
-  // so poll readyState instead of relying on canplay/canplaythrough).
+  // Autoplay-blocked detection: if hero1 is buffered enough but never
+  // starts, fall back to the animated-WebP path.
   let ticks = 0;
   const watchdog = setInterval(() => {
     ticks++;
-    if (animMode || !heroVideo.isConnected) { clearInterval(watchdog); return; }
-    if (!heroVideo.paused) { clearInterval(watchdog); return; }
-    if (heroVideo.readyState >= 3) {
-      // Enough data to play, yet still paused: one more attempt, and if it
-      // is rejected the animated fallback takes over via tryPlay's catch.
+    if (animMode || !heroVideo.isConnected || !heroVideo.paused) { clearInterval(watchdog); return; }
+    if (heroVideo.getAttribute("src") && heroVideo.readyState >= 3) {
       delete frame.dataset.loading;
       tryPlay(heroVideo);
-      if (ticks >= 3) { clearInterval(watchdog); enableAnimMode(); }
+      if (ticks >= 4) { clearInterval(watchdog); enableAnimMode(); }
     }
-    if (ticks >= 8) { clearInterval(watchdog); startSecondaryThenGallery(); } // last resort
+    if (ticks >= 20) clearInterval(watchdog);
   }, 1000);
 } else {
   loadGalleryQueue();
@@ -249,9 +260,12 @@ const io = new IntersectionObserver(
       const v = entry.target;
       if (animMode) return;
       if (v.dataset.defer) return; // not unlocked yet (second hero waits for the first)
+      const isShowcase = !!v.closest(".showcase");
       if (entry.isIntersecting) {
-        if (v.dataset.src) loadVideo(v);
-        tryPlay(v);
+        // Showcase heroes are blob-loaded exclusively; never progressive-load
+        // them here (that would double-download and can stall playback).
+        if (v.dataset.src && !isShowcase) loadVideo(v);
+        if (v.getAttribute("src")) tryPlay(v);
       } else {
         v.pause();
       }
