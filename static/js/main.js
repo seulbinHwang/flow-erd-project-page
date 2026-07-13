@@ -203,20 +203,26 @@ function unlockAllVideos() {
 let heroesUpgraded = false;
 function upgradeHeroesToVideo() {
   if (heroesUpgraded) return;
-  heroesUpgraded = true;
   document.querySelectorAll(".showcase").forEach((sc) => {
     const frame = sc.querySelector(".frame");
     const v = sc.querySelector("video");
     if (!frame || !v) return;
-    frame.dataset.stopAnim = "1"; // halt the WebP re-insertion loop
-    frame.querySelectorAll("img.vanim, .playhint").forEach((el) => el.remove());
     if (!v.getAttribute("src") && v.dataset.src) loadVideo(v);
     v.muted = true;
     v.defaultMuted = true;
-    v.play().catch(() => {});
+    const p = v.play();
+    if (p && p.then) {
+      // Only tear down the WebP once the real video is CONFIRMED playing, so a
+      // gesture that doesn't grant playback never leaves a frozen video.
+      p.then(() => {
+        heroesUpgraded = true;
+        frame.dataset.stopAnim = "1";
+        frame.querySelectorAll("img.vanim, .playhint").forEach((el) => el.remove());
+      }).catch(() => {});
+    }
   });
 }
-["pointerdown", "touchstart", "keydown", "click", "wheel"].forEach((ev) =>
+["pointerdown", "touchstart", "keydown", "click"].forEach((ev) =>
   addEventListener(ev, upgradeHeroesToVideo, { passive: true })
 );
 
