@@ -31,7 +31,7 @@ const dbg = (() => {
 function animUrlFor(v) {
   const src = v.getAttribute("src") || v.dataset.src || "";
   const name = src.split("/").pop().split("?")[0].replace(/\.mp4$/, "");
-  return "static/anim/" + name + ".webp?v=12";
+  return "static/anim/" + name + ".webp?v=13";
 }
 
 // Fallback re-insert interval when a clip has no data-anim-ms (ms).
