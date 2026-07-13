@@ -45,15 +45,6 @@ const ANIM_LOOP_MS = 9000;
 function coverWithAnim(v) {
   const frame = v.closest(".frame");
   if (!frame || frame.dataset.anim) return;
-  // Heroes never use the low-quality animated WebP. If their video can't
-  // autoplay, show a play button that plays the full-quality video instead
-  // (one click unlocks and plays every hero as HQ video).
-  if (v.closest(".showcase")) {
-    frame.dataset.anim = "1";
-    delete frame.dataset.loading;
-    showPlayOverlay(v);
-    return;
-  }
   frame.dataset.anim = "1";
   fetch(animUrlFor(v))
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
@@ -246,6 +237,7 @@ if (heroVideo) {
   // retry hard on timers, on visibility change, on window load, and on the
   // first user gesture instead of giving up.
   function retryHeroes() {
+    if (animMode) return;
     document.querySelectorAll(".showcase video").forEach((v) => {
       if (!v.getAttribute("src")) return;
       const r = v.getBoundingClientRect();
@@ -261,17 +253,15 @@ if (heroVideo) {
   // Load hero2 + gallery only after hero1 is fully buffered (no contention).
   whenFullyBuffered(heroVideo, startSecondaryThenGallery, 15000);
 
-  // Last resort: if hero1 genuinely won't autoplay after all retries, show a
-  // play button on each hero (one click plays every hero as HQ video) and let
-  // the gallery use its WebP fallback. Heroes NEVER use the WebP.
+  // Some Safari installs block muted-video autoplay per-site (no amount of
+  // retrying overrides that). If the hero is still paused shortly after load,
+  // switch to the animated-image fallback, which auto-plays and loops without
+  // a gesture. (Animated images are exempt from the autoplay policy.)
   setTimeout(() => {
     if (!heroVideo.isConnected) return;
     delete frame.dataset.loading;
-    if (heroVideo.paused && document.visibilityState === "visible") {
-      document.querySelectorAll(".showcase video").forEach((v) => showPlayOverlay(v));
-      enableAnimMode();
-    }
-  }, 6000);
+    if (heroVideo.paused && document.visibilityState === "visible") enableAnimMode();
+  }, 2500);
 } else {
   loadGalleryQueue();
 }
