@@ -1,0 +1,14 @@
+{
+  "_note": "Final gallery ROI crops actually shipped on the page. Values are ffmpeg-style [x0, y0, x1, y1] in the 1920x1080 master-render pixel space. Feed as crop=W:H:X:Y to tools/encode_video.sh (W=x1-x0, H=y1-y0, X=x0, Y=y0). Regenerate a fresh box for a new clip with tools/compute_roi.py; these were then hand-nudged so no agent gets clipped.",
+  "crops_xyxy": {
+    "signal_complex_1":     [0,   312, 1336, 752],
+    "signal_complex_2":     [2,   320, 1322, 744],
+    "motorcycle_pedestrian":[0,   162, 1602, 902],
+    "yield_crowd_signal":   [0,   152, 1620, 912],
+    "arterial_curve":       [16,  154, 1644, 924],
+    "maneuver_drive":       [6,   310, 1340, 754],
+    "highway_merge":        [0,   306, 1346, 758],
+    "highway_cruise":       [0,   102, 1710, 962],
+    "complex_terrain":      [0,   176, 1578, 888]
+  }
+}
