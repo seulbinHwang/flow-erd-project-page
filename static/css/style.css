@@ -160,6 +160,26 @@ a.btn:hover { border-color: var(--accent); transform: translateY(-1px); }
   background: var(--accent);
   padding: 2px 9px; border-radius: 999px;
 }
+.hf-btn {
+  --hf-yellow: #ffd21e;
+  border-color: color-mix(in srgb, var(--hf-yellow) 42%, var(--line));
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--hf-yellow) 8%, var(--panel)),
+    var(--panel) 64%);
+}
+.hf-btn .hf-mark {
+  width: 20px;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+  font-size: 18px;
+  line-height: 1;
+  text-align: center;
+  flex: none;
+}
+.hf-btn em { background: var(--hf-yellow); color: #171714; }
+a.hf-btn:hover {
+  border-color: var(--hf-yellow);
+  box-shadow: 0 10px 30px -22px color-mix(in srgb, var(--hf-yellow) 80%, transparent);
+}
 .btn.soon { cursor: default; opacity: .85; }
 .btn.soon:hover { border-color: var(--line); }
 
