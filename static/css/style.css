@@ -573,10 +573,15 @@ footer p { color: var(--muted); font-size: 13.5px; max-width: 54em; margin: 0 au
 .application-card video { aspect-ratio: 16 / 9; object-fit: contain; }
 .application-card figcaption { padding: 16px 20px 20px; color: var(--muted); font-size: 14px; }
 .application-card figcaption strong { color: var(--text); }
+.application-text { grid-column: 1 / -1; border-left: 3px solid var(--accent); }
+.application-text p { padding: 0 20px 20px; color: var(--muted); font-size: 15px; }
+.application-text p strong { color: var(--text); }
 @media (max-width: 600px) {
   .application-heading { padding: 12px 10px; min-height: 100px; }
   .application-label { font-size: 9px; letter-spacing: .03em; }
   .application-card figcaption { padding: 12px 10px; font-size: 12px; }
   .application-card .playhint .pbtn { width: 48px; height: 48px; }
   .application-card .playhint .pbtn::after { border-width: 10px 0 10px 16px; }
+  .application-text .application-heading { min-height: 0; }
+  .application-text p { padding: 0 10px 14px; font-size: 14px; }
 }
