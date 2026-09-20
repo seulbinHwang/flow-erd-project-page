@@ -213,6 +213,11 @@ a.hf-btn:hover {
   flex: none;
 }
 .hero-rank strong { color: var(--accent); font-weight: 700; }
+.hero-rank > a {
+  color: inherit;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+}
 
 /* ---------- video frames ---------- */
 .showcase { margin: 0 auto; max-width: 940px; }
@@ -534,6 +539,14 @@ footer p { color: var(--muted); font-size: 13.5px; max-width: 54em; margin: 0 au
 
 /* ---------- responsive ---------- */
 @media (max-width: 880px) {
+  .hero-rank {
+    white-space: normal;
+    overflow: visible;
+    align-items: flex-start;
+    padding: 12px 14px;
+  }
+  .hero-rank > a { min-width: 0; overflow-wrap: anywhere; }
+  .hero-rank .rank-medal { margin-top: 4px; }
   .stats { grid-template-columns: 1fr; }
   .cards, .grid, .figrow { grid-template-columns: 1fr; }
   .navlinks { display: none; }
