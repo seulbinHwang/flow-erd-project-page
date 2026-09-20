@@ -554,7 +554,7 @@ footer p { color: var(--muted); font-size: 13.5px; max-width: 54em; margin: 0 au
   .erow { grid-template-columns: 104px 1fr 44px; }
 }
 
-/* Application demos stay side by side, with uncropped full-frame video. */
+/* Application demos use two columns on desktop and stack on small screens. */
 .applications-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -589,12 +589,15 @@ footer p { color: var(--muted); font-size: 13.5px; max-width: 54em; margin: 0 au
 .application-text { grid-column: 1 / -1; border-left: 3px solid var(--accent); }
 .application-text p { padding: 0 20px 20px; color: var(--muted); font-size: 15px; }
 .application-text p strong { color: var(--text); }
+@media (max-width: 880px) {
+  .applications-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+}
 @media (max-width: 600px) {
-  .application-heading { padding: 12px 10px; min-height: 100px; }
-  .application-label { font-size: 9px; letter-spacing: .03em; }
-  .application-card figcaption { padding: 12px 10px; font-size: 12px; }
+  .application-heading { padding: 14px; }
+  .application-heading h3 { font-size: 18px; }
+  .application-label { font-size: 10px; letter-spacing: .03em; }
+  .application-card figcaption { padding: 14px; font-size: 14px; }
   .application-card .playhint .pbtn { width: 48px; height: 48px; }
   .application-card .playhint .pbtn::after { border-width: 10px 0 10px 16px; }
-  .application-text .application-heading { min-height: 0; }
-  .application-text p { padding: 0 10px 14px; font-size: 14px; }
+  .application-text p { padding: 0 14px 14px; font-size: 14px; }
 }
