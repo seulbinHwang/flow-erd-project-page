@@ -478,7 +478,7 @@ tr.ours td.rank { color: var(--accent); font-weight: 700; }
 }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
 /* let the gallery videos break out of the text column so they read larger */
-#gallery .grid {
+#gallery .grid, .applications-grid {
   width: min(1400px, calc(100vw - 48px));
   position: relative;
   left: 50%;
@@ -486,7 +486,7 @@ tr.ours td.rank { color: var(--accent); font-weight: 700; }
 }
 @media (min-width: 1421px) {
   /* keep clear of the fixed table of contents on the left */
-  #gallery .grid { width: clamp(1012px, calc(100vw - 480px), 1400px); }
+  #gallery .grid, .applications-grid { width: clamp(1012px, calc(100vw - 480px), 1400px); }
 }
 .cell { display: flex; flex-direction: column; }
 .cell .frame { border-radius: 14px; }
@@ -539,4 +539,44 @@ footer p { color: var(--muted); font-size: 13.5px; max-width: 54em; margin: 0 au
   .navlinks { display: none; }
   .tldr p { font-size: 17px; }
   .erow { grid-template-columns: 104px 1fr 44px; }
+}
+
+/* Application demos stay side by side, with uncropped full-frame video. */
+.applications-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 2vw, 24px);
+  margin-top: 28px;
+}
+.application-card {
+  min-width: 0;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.application-heading { padding: 18px 20px 14px; }
+.application-label {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.application-heading h3 {
+  margin-top: 5px;
+  font-size: clamp(14px, 1.6vw, 21px);
+  line-height: 1.35;
+  font-weight: 600;
+}
+.application-card .frame { border-radius: 0; border-width: 1px 0; box-shadow: none; }
+.application-card video { aspect-ratio: 16 / 9; object-fit: contain; }
+.application-card figcaption { padding: 16px 20px 20px; color: var(--muted); font-size: 14px; }
+.application-card figcaption strong { color: var(--text); }
+@media (max-width: 600px) {
+  .application-heading { padding: 12px 10px; min-height: 100px; }
+  .application-label { font-size: 9px; letter-spacing: .03em; }
+  .application-card figcaption { padding: 12px 10px; font-size: 12px; }
+  .application-card .playhint .pbtn { width: 48px; height: 48px; }
+  .application-card .playhint .pbtn::after { border-width: 10px 0 10px 16px; }
 }

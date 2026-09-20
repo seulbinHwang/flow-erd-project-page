@@ -168,6 +168,11 @@ function cycleGalleryFallback(v) {
 
 function useGalleryFallback(v) {
   if (isShowcase(v)) return;
+  // Application demos preserve native video quality; no animated twin exists.
+  if (v.dataset.noAnim) {
+    if (visibleVideos.has(v)) showPlayOverlay(v);
+    return;
+  }
   galleryFallbackVideos.add(v);
   v.pause();
   hidePlayOverlay(v);

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,550;9..144,650&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/style.css?v=15">
+  <link rel="stylesheet" href="static/css/style.css?v=16">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128664;</text></svg>">
 </head>
 <body>
@@ -17,6 +17,7 @@
   <a class="brand" href="#top">Flow&#8209;ERD</a>
   <div class="navlinks">
     <a href="#tldr">TL;DR</a>
+    <a href="#applications">Applications</a>
     <a href="#gallery">Gallery</a>
     <a href="#diversity">Diversity</a>
     <a href="#multimodality">Multimodality</a>
@@ -29,6 +30,7 @@
   <ol>
     <li><a href="#top">Video</a></li>
     <li><a href="#tldr">TL;DR</a></li>
+    <li><a href="#applications">Applications</a></li>
     <li><a href="#gallery">Rollout Gallery</a></li>
     <li><a href="#diversity">Diversity</a></li>
     <li><a href="#multimodality">Multimodality</a></li>
@@ -108,8 +110,44 @@
   </div>
 </section>
 
+<section id="applications" class="band">
+  <h2><span class="secno">02</span>World models in action</h2>
+  <p class="subtitle">From outdoor robots to camera-based autonomy.</p>
+
+  <div class="applications-grid">
+    <figure class="application-card">
+      <div class="application-heading">
+        <span class="application-label">01 / Robotics</span>
+        <h3>Outdoor mobile robots</h3>
+      </div>
+      <div class="frame">
+        <video data-src="static/videos/application_outdoor_robot.mp4?v=1"
+               poster="static/posters/application_outdoor_robot.jpg?v=1"
+               data-no-anim="true" width="1920" height="1080"
+               aria-label="Outdoor mobile robot simulation demonstration"
+               muted loop playsinline autoplay controls preload="none"></video>
+      </div>
+      <figcaption>Extending Flow-ERD to <strong>outdoor robot navigation</strong> among moving traffic and pedestrians.</figcaption>
+    </figure>
+    <figure class="application-card">
+      <div class="application-heading">
+        <span class="application-label">02 / Autonomous driving</span>
+        <h3>Multi-view camera world models</h3>
+      </div>
+      <div class="frame">
+        <video data-src="static/videos/application_camera_world_model.mp4?v=1"
+               poster="static/posters/application_camera_world_model.jpg?v=1"
+               data-no-anim="true" width="1920" height="1080"
+               aria-label="Multi-view camera world model extension demonstration"
+               muted loop playsinline autoplay controls preload="none"></video>
+      </div>
+      <figcaption>Toward camera-based world models for <strong>training and evaluating end-to-end ego planners</strong>.</figcaption>
+    </figure>
+  </div>
+</section>
+
 <section id="gallery" class="band">
-  <h2><span class="secno">02</span>Rollout gallery</h2>
+  <h2><span class="secno">03</span>Rollout gallery</h2>
   <p class="subtitle"><span class="egochip">Cyan</span> = ego &middot; white = simulated agents &middot; all rolled out jointly in closed loop</p>
 
   <h3 class="groupTitle">Signalized intersections</h3>
@@ -202,7 +240,7 @@
 </section>
 
 <section id="diversity" class="band">
-  <h2><span class="secno">03</span>Diversity</h2>
+  <h2><span class="secno">04</span>Diversity</h2>
   <p class="subtitle">Realism&ndash;diversity Pareto front &middot; WOSAC 2025 validation split</p>
 
   <div class="figrow">
@@ -239,7 +277,7 @@
 </section>
 
 <section id="multimodality" class="band">
-  <h2><span class="secno">04</span>Intent-level multimodality</h2>
+  <h2><span class="secno">05</span>Intent-level multimodality</h2>
   <p class="subtitle">Is the extra diversity meaningful, or just noise? &middot; 64 closed-loop rollouts per scene &middot; 1,048 WOMD validation scenes</p>
 
   <figure class="figblock">
@@ -293,7 +331,7 @@
 </section>
 
 <section id="overview" class="band">
-  <h2><span class="secno">05</span>Model overview</h2>
+  <h2><span class="secno">06</span>Model overview</h2>
   <figure class="figblock">
     <div class="figpanel"><img loading="lazy" decoding="async" src="static/figures/fig2_overview.png" alt="Flow-ERD architecture: AFM backbone with type-specific kinematics, ERD fine-tuning with entropy-tempered target"></div>
     <figcaption><strong>(a)</strong> AFM generates continuous actions, executed through per-type kinematics.
@@ -302,7 +340,7 @@
 </section>
 
 <section id="ingredients" class="band">
-  <h2><span class="secno">06</span>Two ingredients</h2>
+  <h2><span class="secno">07</span>Two ingredients</h2>
   <div class="cards">
     <article class="card">
       <h3>AFM &mdash; Agent-Type Aware Flow Matching</h3>
@@ -325,7 +363,7 @@
 </section>
 
 <section id="abstract" class="band">
-  <h2><span class="secno">07</span>Abstract</h2>
+  <h2><span class="secno">08</span>Abstract</h2>
   <p class="abstract">
     Realistic and diverse traffic simulation is essential to autonomous driving development. Yet
     prevailing benchmarks predominantly reward realism, and recent methods have optimized accordingly,
@@ -342,7 +380,7 @@
 </section>
 
 <section id="bibtex" class="band">
-  <h2><span class="secno">08</span>BibTeX</h2>
+  <h2><span class="secno">09</span>BibTeX</h2>
   <!-- TODO: update once the arXiv preprint is available (add eprint number / journal). -->
   <pre class="bib"><code>@misc{hwang2026flowerd,
   title         = {Flow-ERD: Agent-type Aware Flow Matching with Entropy-Regularized
@@ -365,6 +403,6 @@
   </p>
 </footer>
 
-<script src="static/js/main.js?v=30"></script>
+<script src="static/js/main.js?v=31"></script>
 </body>
 </html>
