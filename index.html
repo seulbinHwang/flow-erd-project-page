@@ -18,6 +18,7 @@
   <div class="navlinks">
     <a href="#tldr">TL;DR</a>
     <a href="#applications">Applications</a>
+    <a href="#erd-explained">Why &amp; How ERD</a>
     <a href="#gallery">Gallery</a>
     <a href="#diversity">Diversity</a>
     <a href="#multimodality">Multimodality</a>
@@ -31,6 +32,7 @@
     <li><a href="#top">Video</a></li>
     <li><a href="#tldr">TL;DR</a></li>
     <li><a href="#applications">Applications</a></li>
+    <li><a href="#erd-explained">Why &amp; How ERD</a></li>
     <li><a href="#gallery">Rollout Gallery</a></li>
     <li><a href="#diversity">Diversity</a></li>
     <li><a href="#multimodality">Multimodality</a></li>
@@ -153,8 +155,19 @@
   </div>
 </section>
 
+<section id="erd-explained" class="band">
+  <h2><span class="secno">03</span>WHY &amp; HOW ERD WORKS</h2>
+  <div class="frame">
+    <video data-src="static/videos/erd_finetuning.mp4?v=1"
+           poster="static/posters/erd_finetuning.jpg?v=1"
+           data-no-anim="true" width="1920" height="1080"
+           aria-label="Why and how entropy-regularized distillation works"
+           muted loop playsinline autoplay controls preload="none"></video>
+  </div>
+</section>
+
 <section id="gallery" class="band">
-  <h2><span class="secno">03</span>Rollout gallery</h2>
+  <h2><span class="secno">04</span>Rollout gallery</h2>
   <p class="subtitle"><span class="egochip">Cyan</span> = ego &middot; white = simulated agents &middot; all rolled out jointly in closed loop</p>
 
   <h3 class="groupTitle">Signalized intersections</h3>
@@ -247,7 +260,7 @@
 </section>
 
 <section id="diversity" class="band">
-  <h2><span class="secno">04</span>Diversity</h2>
+  <h2><span class="secno">05</span>Diversity</h2>
   <p class="subtitle">Realism&ndash;diversity Pareto front &middot; WOSAC 2025 validation split</p>
 
   <div class="figrow">
@@ -284,7 +297,7 @@
 </section>
 
 <section id="multimodality" class="band">
-  <h2><span class="secno">05</span>Intent-level multimodality</h2>
+  <h2><span class="secno">06</span>Intent-level multimodality</h2>
   <p class="subtitle">Is the extra diversity meaningful, or just noise? &middot; 64 closed-loop rollouts per scene &middot; 1,048 WOMD validation scenes</p>
 
   <figure class="figblock">
@@ -338,7 +351,7 @@
 </section>
 
 <section id="overview" class="band">
-  <h2><span class="secno">06</span>Model overview</h2>
+  <h2><span class="secno">07</span>Model overview</h2>
   <figure class="figblock">
     <div class="figpanel"><img loading="lazy" decoding="async" src="static/figures/fig2_overview.png" alt="Flow-ERD architecture: AFM backbone with type-specific kinematics, ERD fine-tuning with entropy-tempered target"></div>
     <figcaption><strong>(a)</strong> AFM generates continuous actions, executed through per-type kinematics.
@@ -347,7 +360,7 @@
 </section>
 
 <section id="ingredients" class="band">
-  <h2><span class="secno">07</span>Two ingredients</h2>
+  <h2><span class="secno">08</span>Two ingredients</h2>
   <div class="cards">
     <article class="card">
       <h3>AFM &mdash; Agent-Type Aware Flow Matching</h3>
@@ -370,7 +383,7 @@
 </section>
 
 <section id="abstract" class="band">
-  <h2><span class="secno">08</span>Abstract</h2>
+  <h2><span class="secno">09</span>Abstract</h2>
   <p class="abstract">
     Realistic and diverse traffic simulation is essential to autonomous driving development. Yet
     prevailing benchmarks predominantly reward realism, and recent methods have optimized accordingly,
@@ -387,7 +400,7 @@
 </section>
 
 <section id="bibtex" class="band">
-  <h2><span class="secno">09</span>BibTeX</h2>
+  <h2><span class="secno">10</span>BibTeX</h2>
   <!-- TODO: update once the arXiv preprint is available (add eprint number / journal). -->
   <pre class="bib"><code>@misc{hwang2026flowerd,
   title         = {Flow-ERD: Agent-type Aware Flow Matching with Entropy-Regularized
