@@ -205,6 +205,8 @@ a.paper-btn:hover {
   flex: none;
 }
 .hero-rank strong { color: var(--accent); font-weight: 700; }
+.waymo-brand { display: inline-block; white-space: nowrap; }
+.waymo-logo { display: inline-block; width: 1.7em; height: auto; vertical-align: -.12em; }
 .hero-rank > a {
   color: inherit;
   text-decoration-color: var(--accent);
