@@ -136,7 +136,8 @@ h1 {
 .author-link:hover { color: var(--accent); text-decoration-color: var(--accent); }
 .author-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
 .author-link .external-mark { color: var(--accent); font-size: .75em; margin-left: 4px; vertical-align: .18em; }
-.affil { color: var(--muted); font-size: 14.5px; margin-bottom: 28px; }
+.affil { color: var(--muted); font-size: 14.5px; margin-bottom: 10px; }
+.venue { color: var(--accent); font-weight: 600; font-size: 15px; letter-spacing: .01em; margin-bottom: 28px; }
 .affil .contrib { display: block; font-size: 12.5px; margin-top: 4px; }
 .affil .contrib sup { color: var(--accent); }
 
