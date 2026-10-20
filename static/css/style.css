@@ -140,6 +140,8 @@ h1 {
 .venue { color: var(--accent); font-weight: 600; font-size: 15px; letter-spacing: .01em; margin-bottom: 28px; }
 .affil .contrib { display: block; font-size: 12.5px; margin-top: 4px; }
 .affil .contrib sup { color: var(--accent); }
+.affil .contrib .equal { color: var(--accent); font-weight: 700; }
+.venue .venue-note { display: block; color: var(--text); font-weight: 500; font-size: 14px; margin-top: 4px; }
 
 .linkrow { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
 .btn {
