@@ -163,28 +163,19 @@ a.btn:hover { border-color: var(--accent); transform: translateY(-1px); }
   background: var(--accent);
   padding: 2px 9px; border-radius: 999px;
 }
-.paper-btn {
+.paper-btn, .code-btn {
   --paper-yellow: #ffd21e;
   border-color: color-mix(in srgb, var(--paper-yellow) 42%, var(--line));
   background: linear-gradient(135deg,
     color-mix(in srgb, var(--paper-yellow) 8%, var(--panel)),
     var(--panel) 64%);
 }
-.paper-btn em { background: var(--paper-yellow); color: #171714; }
-a.paper-btn:hover {
+.paper-btn em, .code-btn em { background: var(--paper-yellow); color: #171714; }
+a.paper-btn:hover, a.code-btn:hover {
   border-color: var(--paper-yellow);
   box-shadow: 0 10px 30px -22px color-mix(in srgb, var(--paper-yellow) 80%, transparent);
 }
-.code-btn {
-  border: 2px solid var(--accent);
-  font-weight: 700;
-}
-.code-btn svg { fill: currentColor; }
-.code-btn em { background: var(--bg); color: var(--text); }
-a.code-btn:hover {
-  border-color: var(--accent-2);
-}
-a.code-btn:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 4px; }
+a.paper-btn:focus-visible, a.code-btn:focus-visible { outline: 2px solid var(--paper-yellow); outline-offset: 4px; }
 
 .hero-rank {
   display: flex;
