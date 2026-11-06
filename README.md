@@ -12,7 +12,7 @@ python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
-Live: https://seulbinhwang.github.io/flow-erd-project-page/ · Paper: https://arxiv.org/abs/2607.06957
+Live: https://seulbinhwang.github.io/flow-erd-project-page/ · Paper: https://arxiv.org/abs/2607.06957 · Code: https://github.com/naver/flow-erd
 
 ## Media pipeline
 
@@ -35,7 +35,3 @@ tools/make_promo_image.py --frame frame.png --kind share --size 1600x900 --out s
 
 After changing an asset, bump its `?v=N` in `index.html` (and `ANIM_VER` in
 `static/js/main.js` for WebPs), then commit, push, and verify on the live site.
-
-## Remaining
-
-- [ ] When the code is released: activate the **Code** link in `index.html`.
