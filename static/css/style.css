@@ -176,18 +176,13 @@ a.paper-btn:hover {
   box-shadow: 0 10px 30px -22px color-mix(in srgb, var(--paper-yellow) 80%, transparent);
 }
 .code-btn {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
+  border: 2px solid var(--accent);
   font-weight: 700;
-  box-shadow: 0 4px 24px -8px color-mix(in srgb, var(--accent) 65%, transparent);
 }
 .code-btn svg { fill: currentColor; }
-.code-btn em { background: var(--bg); color: var(--accent-2); }
+.code-btn em { background: var(--bg); color: var(--text); }
 a.code-btn:hover {
-  background: var(--accent-2);
   border-color: var(--accent-2);
-  box-shadow: 0 6px 28px -8px color-mix(in srgb, var(--accent) 85%, transparent);
 }
 a.code-btn:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 4px; }
 
